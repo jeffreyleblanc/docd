@@ -1,0 +1,180 @@
+#! /usr/bin/env python3
+
+# SPDX-FileCopyRightText: Copyright (c) 2023-present Jeffrey LeBlanc
+# SPDX-License-Indentifier: UNLICENSED
+
+import argparse
+from pathlib import Path
+from dataclasses import dataclass
+import toml
+import json
+from docd.utils.proc import proc
+from docd.utils.obj import DictObj
+
+@dataclass
+class DocdRunContext:
+    SUPPORT_RESOURCES_DIRPATH: Path = None
+    # Docs info
+    DOCS_REPO_DIRPATH: Path = None
+    DOCS_CONFIG_FILEPATH: Path = None
+    DOCS_DOCS_DIRPATH: Path = None
+    DOCS_DIST_DIRPATH: Path = None
+
+
+if __name__ == "__main__":
+    __VERSION__ = "0.0.2"
+
+    #-- Make the argparser -----------------------------------------------------------#
+
+    # Main Parser
+    parser = argparse.ArgumentParser(description="docd: For building awesome docs.")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__VERSION__}")
+    parser.add_argument("-R","--repo-directory",help="Root document repo directory. Defaults to cwd.",default=None)
+
+    # Create subparsers
+    subparsers = parser.add_subparsers(help="sub-command help",dest="main_command")
+
+    # builders
+    subp_build = subparsers.add_parser("build", help="Build the complete docd site")
+    subp_spa = subparsers.add_parser("spa", help="Make the docd spa scaffold")
+    subp_publish = subparsers.add_parser("publish", help="Convert the source docs to html")
+    subp_publish.add_argument("-f","--filepath",default=None)
+    subp_clean = subparsers.add_parser("clean", help="Clean out the docd site")
+
+    # Serve
+    subp_serve = subparsers.add_parser("serve", help="Serve the document")
+    subp_serve.add_argument("-p","--port", help="port", type=int, default=8001)
+    subp_serve.add_argument("--open",action="store_true",help="Open server to exterior connections")
+    subp_serve.add_argument("--allowed",nargs="*",type=str,default=None)
+
+    # Push
+    subp_push = subparsers.add_parser("push", help="Push docs to a remote")
+
+    # Check
+    subp_check = subparsers.add_parser("check", help="Check docs for filter phrases")
+
+    # Helper Methods
+    subp_info = subparsers.add_parser("info", help="Print info on the repo config")
+
+    #-- Process args -----------------------------------------------------------#
+
+    args = parser.parse_args()
+    if args.main_command is None:
+        # Can also `parser.print_usage()`
+        parser.print_help()
+        exit(1)
+
+    #-- Generate Context -----------------------------------------------------------#
+
+    # Make Context Object
+    ctx = DocdRunContext()
+
+    # Determine if we are operating locally or from installed version,
+    # and then set support paths accordingly
+    _here = Path(__file__).parent
+    if _here == Path("/usr/local/bin"):
+        ctx.SUPPORT_RESOURCES_DIRPATH = Path("/usr/local/lib/docd/support/")
+    else:
+        ctx.SUPPORT_RESOURCES_DIRPATH = _here/"support/"
+    assert ctx.SUPPORT_RESOURCES_DIRPATH.is_dir()
+
+    # Determine the doc repo paths
+    _repo = Path(args.repo_directory) if args.repo_directory is not None else Path.cwd()
+    ctx.DOCS_REPO_DIRPATH = _repo
+    assert ctx.DOCS_REPO_DIRPATH.is_dir()
+    ctx.DOCS_CONFIG_FILEPATH = _repo/"docd.toml"
+    assert ctx.DOCS_CONFIG_FILEPATH.is_file()
+    ctx.DOCS_DOCS_DIRPATH = _repo/"docs/"
+    assert ctx.DOCS_DOCS_DIRPATH.is_dir()
+    ctx.DOCS_DIST_DIRPATH = _repo/"_dist/"
+
+    # Load the config
+    config = DictObj(toml.load(ctx.DOCS_CONFIG_FILEPATH))
+    # Make sure we have the 'site' attributes
+    for k in ( "site.title","site.name","site.footer" ):
+        if config.get_path(k) is None:
+            raise Exception(f"docd.toml missing `{k}`")
+    if "home_addr" not in config.site:
+        config.site.home_addr = ""
+    # Check on 'remote' attributes
+    if "remote" not in config:
+        config.remote = None
+    else:
+        for k in ( "remote.user","remote.addr","remote.path" ):
+            if config.get_path(k) is None:
+                raise Exception(f"docd.toml missing `{k}`")
+    # Check on 'check' attributes
+    if "check" not in config:
+        config.check =DictObj({})
+    if "filter_phrases" not in config.check:
+        config.check.filter_phrases = ""
+
+
+    #-- Execute the Commands -----------------------------------------------------------#
+
+    match args.main_command:
+        case "info":
+            import pprint
+            pp = pprint.PrettyPrinter(indent=4)
+            print("# args:")
+            pp.pprint(args)
+            print("\n# ctx:")
+            pp.pprint(ctx)
+            print("\n# config:")
+            print(json.dumps(config.to_dict(),indent=4))
+
+        case ("build"|"spa"|"publish"):
+            from docd.publisher import Publisher
+            pub = Publisher(ctx,config.site)
+            if args.main_command in ("build","spa"):
+                pub.build_spa()
+            if args.main_command in ("build","publish"):
+                pub.build_docs()
+
+        case "clean":
+            import shutil
+            assert ctx.DOCS_DIST_DIRPATH.is_dir()
+            for fp in ctx.DOCS_DIST_DIRPATH.iterdir():
+                if fp.is_dir():
+                    shutil.rmtree(fp)
+                else:
+                    fp.unlink()
+
+        case "serve":
+            import docd.cmd_serve as SERVE
+            args.directory = ctx.DOCS_DIST_DIRPATH
+            SERVE.main_run(args)
+
+        case "check":
+            import docd.cmd_check as CHECK
+            CHECK.main_run(ctx,config)
+
+        case "push":
+            # Pull out info
+            remote = config.remote
+            if remote is None:
+                raise Exception("No remote is defined.")
+            user = remote.user
+            addr = remote.addr
+            remote_path = remote.path
+
+            # Assemble paths
+            src = f"{ctx.DOCS_DIST_DIRPATH}/."
+            dst = remote_path
+            if dst.endswith("/."):
+                pass
+            elif dst.endswith("/"):
+                dst += "."
+            else:
+                dst += "/."
+            assert src.endswith("/.") and not src.endswith("//.")
+            assert dst.endswith("/.") and not dst.endswith("//.")
+
+            # Make the rsync command
+            cmd = f"rsync -avz --delete {src} {user}@{addr}:{dst}"
+            c,o,e = proc(cmd)
+            print(c,o,e)
+
+        case _:
+            print("ERROR: Failed to find command `{args.main_command}`")
+

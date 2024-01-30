@@ -1,0 +1,18 @@
+/*
+SPDX-FileCopyRightText: Copyright (c) 2023-present Jeffrey LeBlanc
+SPDX-License-Indentifier: MIT
+*/
+
+@import 'tailwindcss/base';
+
+@import 'tailwindcss/components';
+@import './ui-custom-utilities';
+
+@import 'tailwindcss/utilities';
+@import './ui-structure.css';
+@import './docd-theme.css';
+@import './docd-syntax-light.css';
+/* @import './docd-syntax-dark-monokai.css'; */
+@import './docd-syntax-dark-material.css';
+@import './docd-article.css';
+

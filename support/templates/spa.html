@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>${title}</title>
+    <meta name="description" content="Spackle SPA">
+    <meta name="author" content="Jeffrey LeBlanc">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="static/compiled.css">
+    <script type="text/javascript">
+        window.$NAME = "${name}";
+        window.$FOOTER = "${footer}";
+        window.$HOME_ADDR = "${home_addr}";
+    </script>
+</head>
+<body>
+    <div id="mount"></div>
+    <script type="module" src="static/compiled.js"></script>
+</body>
+</html>

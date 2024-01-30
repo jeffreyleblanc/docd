@@ -1,0 +1,7 @@
+# Ignore python artifacts
+/venv/
+*.pyc
+
+# Ignore what is put in static
+/support/static/*.css*
+/support/static/*.js*

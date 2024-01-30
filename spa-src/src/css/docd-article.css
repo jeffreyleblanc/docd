@@ -1,0 +1,190 @@
+/*
+SPDX-FileCopyRightText: Copyright (c) 2023-present Jeffrey LeBlanc
+SPDX-License-Indentifier: MIT
+*/
+
+
+@layer components {
+    ._throw-away {}
+
+    .docd-article {
+        @apply
+            flex flex-col gap-y-6
+            leading-6
+            break-words
+            th-core-text-base
+        ;
+    }
+
+    /*-- Headers ---------------------------------------*/
+
+        .docd-article h1 {
+           @apply
+                text-3xl font-bold tracking-wider
+                th-core-text-pop
+                mt-8 mb-2
+                first:mt-0
+            ;
+        }
+
+        .docd-article h2 {
+           @apply
+                text-2xl font-bold tracking-wider
+                th-core-text-pop
+                mt-8 mb-2
+            ;
+        }
+
+        .docd-article h3 {
+            @apply
+                text-xl font-bold tracking-wider
+                th-core-text-pop
+                mt-8 mb-2
+            ;
+        }
+
+        .docd-article h4 {
+            @apply
+                text-lg font-bold tracking-wider
+                th-core-text-pop
+                mt-8 mb-2
+            ;
+        }
+
+        .docd-article h1 > code, h2 > code, h3 > code, h4 > code {
+            @apply
+                px-2 pb-0.5 pt-1
+                rounded
+                th-core-bg-surface1
+                th-core-text-base
+            ;
+        }
+
+    /*-- Core Text ---------------------------------------*/
+
+        .docd-article ul, .docd-article p {
+            /*
+            pass
+            */
+        }
+
+        .docd-article ul code, .docd-article p code {
+            @apply
+                text-sm
+                px-1 pb-0.5 pt-1
+                rounded-sm
+                th-core-bg-surface1
+                th-core-text-base
+            ;
+        }
+
+        .docd-article a {
+            @apply
+                underline
+                underline-offset-4
+                th-link-text
+            ;
+        }
+
+        .docd-article hr {
+            @apply
+                border-0
+                h-px
+                min-h-[1px]
+                th-core-bg-muted
+            ;
+        }
+
+        .docd-article blockquote {
+            @apply
+                border-l-[0.75rem]
+                border-blue-600
+                py-4
+                px-8
+                bg-blue-100
+                dark:bg-blue-950
+                rounded-sm
+            ;
+        }
+
+    /*-- Lists ---------------------------------------*/
+
+        /* Also see: https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type */
+
+        .docd-article ul {
+            @apply
+                list-outside
+                list-disc
+            ;
+        }
+
+        /* Indent subsequent lists */
+        .docd-article ul ul,ol {
+            @apply ml-8;
+        }
+
+        .docd-article ol {
+            @apply
+                list-outside
+                list-decimal
+            ;
+        }
+
+        /* Indent subsequent lists */
+        .docd-article ol ol,ul {
+            @apply ml-8;
+        }
+
+    /*-- Pre ---------------------------------------*/
+
+        /*
+        Alternatives for pre wrapping/scroll to investigate
+        overflow-x: auto;
+        overflow-wrap: break-word;
+        */
+
+        .docd-article > pre {
+            @apply
+                py-4
+                px-6
+                rounded
+                overflow-x-auto /* Adds scrollbar only if needed */
+                th-core-bg-surface1
+            ;
+        }
+        .docd-article > pre code {
+            @apply
+                text-sm /* I haven't figured out why we need this */
+                leading-5
+            ;
+        }
+
+        .highlighted-syntax {
+            @apply
+                text-sm /* I haven't figured out why we need this */
+                py-4
+                px-6
+                rounded
+                border-none
+                overflow-x-auto /* Adds scrollbar only if needed */
+                th-core-bg-surface1
+                th-core-text-base
+            ;
+        }
+        .highlighted-syntax pre {
+            @apply
+                leading-5
+            ;
+        }
+
+    /*-- Images ---------------------------------------*/
+
+        .docd-article img {
+            @apply
+                bg-white
+                border th-core-border-base
+            ;
+        }
+
+
+}
