@@ -7,17 +7,30 @@
 It's designed to roughly mimic `mkdocs`, but have more flexbility.
 
 
-## Setup and Installation
+## Setup and Installation TLDR
+
+On a Debian/Ubuntu System
+
+```sh
+# Install dependencies
+sudo apt-get install make rsync python3-mistune python3-pygments python3-toml nodejs npm ripgrep
+# Setup
+make setup-web
+make build-web
+make install 
+```
+
+## Setup and Installation Details
 
 The following dependencies are required (assuming on Debian/Ubuntu):
 
 ```sh
 sudo apt-get install \
     make rsync \
-    python3-mistune python3-pygments python3-yaml \
+    python3-mistune python3-pygments python3-toml \
     nodejs npm
 # The `check` method uses ripgrep
-sudo apt-get ripgrep
+sudo apt-get install ripgrep
 ```
 
 There are 2 Makefiles, one in the project root and one in `spa-src/`.
