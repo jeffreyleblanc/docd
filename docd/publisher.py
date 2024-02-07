@@ -147,85 +147,76 @@ class Publisher:
                 f.write(content)
 
 
-    def _unpack_dirs(self, SOURCE_ROOT, depth=0, max_depth=100000):
-        indent = " "*(4*depth)
-        # print(f"{indent}UNPACK",SOURCE_ROOT.name,depth)
+    def _unpack_dirs(self, directory_path, depth=0, max_depth=100000):
 
-        curr_path = SOURCE_ROOT.relative_to(self.SOURCE_ROOT)
-        _p_uri = str(curr_path.parent)
-        if str(curr_path) == ".":
-            _p_uri = None
+        # Calculate directory relpath
+        directory_relpath = directory_path.relative_to(self.SOURCE_ROOT)
+        # If we are the root, set the parent as None
+        directory_parent_uri = str(directory_relpath.parent)
+        if str(directory_relpath) == ".":
+            directory_parent_uri = None
+        # Display name exchanges '--' for ': '
+        directory_display_name = directory_relpath.name.replace("--",": ")
 
-        NODE = DocNode(
+        # Add the node for this directory
+        self.doc_nodes.append(DocNode(
             kind = "directory",
-            uri = curr_path,
-            parent_uri = _p_uri,
+            uri = directory_relpath,
+            parent_uri = directory_parent_uri,
             depth = depth,
-            db_uri = curr_path,
-            source_path = curr_path,
-            display_name = curr_path.name.replace("--",":"),
+            db_uri = directory_relpath,
+            source_path = directory_relpath,
+            display_name = directory_display_name,
             display_suffix = None
-        )
-        # NODE = {
-        #     "kind": "directory",
-        #     "uri": str(curr_path),
-        #     "parent_uri": _p_uri,
-        #     "depth": depth,
-        #     "db_uri": str(curr_path),
-        #     "source_path": str(curr_path),
-        #     "display_name": curr_path.name.replace("--",":"),
-        #     "display_suffix": None
-        # }
-        self.doc_nodes.append(NODE)
+        ))
 
         # Traverse the sources
-        srcs = sorted([s for s in SOURCE_ROOT.iterdir()])
-        for path in srcs:
+        children = sorted([s for s in directory_path.iterdir()])
+        for child_path in children:
             # Ignore skipped directories (Note should make deep path support)
-            if path.is_dir() and path.name in SKIP_DIRECTORIES:
+            if child_path.is_dir() and child_path.name in SKIP_DIRECTORIES:
                 continue
 
-            # Get the relative path
-            relpath = path.relative_to(self.SOURCE_ROOT)
+            # Get the relative child_path
+            child_relpath = child_path.relative_to(self.SOURCE_ROOT)
 
             # If this is a file, add entry
-            if path.is_file():
+            if child_path.is_file():
 
-                relpath_parent = relpath.parent
-                _name = relpath.name
-                _stem = relpath.stem
-                _suffix = relpath.suffix
+                # Pull out path components
+                relpath_parent = child_relpath.parent
+                _name = child_relpath.name
+                _stem = child_relpath.stem
+                _suffix = child_relpath.suffix
 
+                # If it's a markdown file, set suffix to nothing
+                # If it's not, set the stem to show the suffix
                 if _suffix == ".md" or _suffix == "":
                     _suffix = ""
                 else:
                     _stem += f"--dot-{_suffix[1:]}"
 
-                # FNODE = {
-                #     "kind": "file",
-                #     "uri": str(relpath_parent/_stem),
-                #     "parent_uri": str(relpath.parent),
-                #     "depth": depth,
-                #     "db_uri": str(relpath_parent/_stem)+".html",
-                #     "source_path": str(relpath),
-                #     "display_name": relpath.stem.replace("--",":"),
-                #     "display_suffix": _suffix
-                # }
-                FNODE = DocNode(
+                # The database uri is always an html file
+                child_db_uri = relpath_parent/f"{_stem}.html"
+
+                # Display name exchanges '--' for ': '
+                child_display_name = child_relpath.stem.replace("--",": ")
+
+                # Add the node for this file
+                self.doc_nodes.append(DocNode(
                     kind = "file",
                     uri = relpath_parent/_stem,
-                    parent_uri = relpath.parent,
+                    parent_uri = child_relpath.parent,
                     depth = depth,
-                    db_uri = relpath_parent/f"{_stem}.html",
-                    source_path = relpath,
-                    display_name = relpath.stem.replace("--",":"),
+                    db_uri = child_db_uri,
+                    source_path = child_relpath,
+                    display_name = child_display_name,
                     display_suffix = _suffix
-                )
-                self.doc_nodes.append(FNODE)
+                ))
 
-            # If this is a directory, parse or return
-            elif path.is_dir() and depth+1 <= max_depth:
-                subnode = self._unpack_dirs(path,depth=depth+1,max_depth=max_depth)
+            # If this is a directory, recurse or return depending on depth
+            elif child_path.is_dir() and depth+1 <= max_depth:
+                subnode = self._unpack_dirs(child_path,depth=depth+1,max_depth=max_depth)
 
 
     def _render_page(self, source_path, language):
