@@ -59,7 +59,7 @@ export default {
     },
     methods: {
         load_page(page_obj){
-            this.$M.load_page(page_obj);
+            this.$M.load_page_by_uri(page_obj.uri);
         }
     }
 }

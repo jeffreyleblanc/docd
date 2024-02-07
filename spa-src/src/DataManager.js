@@ -106,7 +106,7 @@ export default class DataManager {
             const curr_hash = document.location.hash;
             if(curr_hash.startsWith("#")){
                 const page_uri = curr_hash.substring(1).trim();
-                this.load_page(page_uri);
+                this.load_page_by_uri(page_uri);
             }
         }
 
@@ -157,9 +157,10 @@ export default class DataManager {
             }
         }
 
-        async load_page(page_obj){
+        async load_page_by_uri(uri){
+            const page_obj = this._data.nodes_by_path.get(uri);
             const db_uri = page_obj.db_uri;
-            const page_uri = page_obj.uri
+            const page_uri = uri; // page_obj.uri
             // => set a loading notice
             try {
                 this._uistate.error_open = false;
