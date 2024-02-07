@@ -36,14 +36,14 @@ SPDX-License-Indentifier: MIT
         </section>
         <section class="ui-parent-row items-start gap-x-2 text-sm">
             <IconGeoAltFill class="basis-4 grow-0 shrink-0 sq-4 mt-0.5 th-core-text-muted"/>
-            <span class="th-core-text-base">{{article_uri}}</span>
+            <span class="th-core-text-base">{{current_uri}}</span>
         </section>
         <section class="text-sm flex flex-row items-center gap-x-2 th-core-text-base">
             <IconTextRight class="sq-5 th-core-text-muted"/>
-            <button class="w-fit p-1 rounded th-core-bg-surface1 th-accent-text" @click="close_all" title="open all categories">
+            <button class="w-fit p-1 rounded th-core-bg-surface2 th-accent-text" @click="close_all" title="open all categories">
                 <IconCaretRight class="sq-3"/>
             </button>
-            <button class="w-fit p-1 rounded th-core-bg-surface1 th-accent-text" @click="open_all" title="collapse all categories">
+            <button class="w-fit p-1 rounded th-core-bg-surface2 th-accent-text" @click="open_all" title="collapse all categories">
                 <IconCaretDown class="sq-3"/>
             </button>
         </section>
@@ -54,7 +54,7 @@ SPDX-License-Indentifier: MIT
             v-if="root_node!=null"
             :deep="false"
             :node="root_node"
-            :article_uri="article_uri"
+            :current_uri="current_uri"
         />
     </section>
 </nav>
@@ -99,7 +99,7 @@ export default {
         },
         is_darkmode(){ return this.theme=="dark"; },
         is_mobile(){ return this.$M.uistate.is_mobile; },
-        article_uri(){ return this.$M.data.article_uri; }
+        current_uri(){ return this.$M.data.current_uri; }
     },
     methods: {
         // pass

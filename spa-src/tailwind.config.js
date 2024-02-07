@@ -13,8 +13,9 @@ export default {
         extend: {
             // See https://tailwindcss.com/docs/customizing-colors
             colors: {
-                core: colors.gray,
-                accent: colors.cyan
+                core: colors.zinc,
+                dkaccent: colors.purple,
+                ltaccent: colors.sky
             }
         },
     },

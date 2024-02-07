@@ -17,27 +17,20 @@ export default class DataManager {
         });
 
         this._data = reactive({
+            // Names
             name: config.name,
             footer_text: config.footer_text,
             home_addr: config.home_addr,
+            // Page Node Data
             root_node: null,
-            nodes_by_path: new Map(),
+            nodes_by_uri: new Map(),
             orphaned_nodes: new Set(),
-            article_uri: "",
-            article_html: ""
+            // Current data
+            current_uri: "",
+            current_html: ""
         });
 
-        // Setup watch for the hashchange
-        // ==> Note this pathway to trigger updates is rare
-        window.addEventListener("hashchange",(event)=>{
-            const url_parts = event.newURL.split("#");
-            if(url_parts.length==2){
-                const new_page_uri = url_parts[1];
-                if(new_page_uri!=this._data.article_uri){
-                    this.load_page(new_page_uri);
-                }
-            }
-        });
+        this._setup_theme();
     }
 
     //-- Vue Hooks and Providers --------------------------------------------//
@@ -51,7 +44,7 @@ export default class DataManager {
 
     //-- UI --------------------------------------------//
 
-        setup_theme(){
+        _setup_theme(){
             // https://tailwindcss.com/docs/responsive-design, matches `md:`
             const IS_MOBILE_QUERY = "(min-width:768px)";
 
@@ -100,7 +93,7 @@ export default class DataManager {
 
         async start(){
             // Fetch the database
-            await this.fetch_database();
+            await this._fetch_database();
 
             // Check if we have a current hash and load that
             const curr_hash = document.location.hash;
@@ -110,24 +103,27 @@ export default class DataManager {
             }
         }
 
-        async fetch_database(){
+        async _fetch_database(){
             const resp = await window.fetch(`db/page-db.json?h=${random_string()}`);
-            const page_db_obj = await resp.json();
-            console.log("fetch_database:resp",page_db_obj);
-            // this._data.side_entries = page_db_obj;
-            page_db_obj.forEach(e=>this.process_node(e));
+            const objects = await resp.json();
+            objects.forEach(e=>this._process_node(e));
         }
 
-        process_node(node){
-            console.log("Process",node.uri)
+        _process_node(node){
             const uri = node.uri;
+
+            // If it's a directory, add containers for children
             if(node.kind == "directory"){
                 node.files = [];
                 node.directories = [];
             }
-            this._data.nodes_by_path.set(uri,node);
+
+            // Save the node by uri
+            this._data.nodes_by_uri.set(uri,node);
+
+            // Add to it's parent, or set as orphaned
             if(node.parent_uri){
-                const parent = this._data.nodes_by_path.get(node.parent_uri)||null;
+                const parent = this._data.nodes_by_uri.get(node.parent_uri)||null;
                 if(parent==null){
                     this._data.orphaned_nodes.add(node)
                 }else{
@@ -138,11 +134,13 @@ export default class DataManager {
                     }
                 }
             }
+
+            // If the uri is ".", set as the root node
             if(uri == "."){
                 this._data.root_node = node;
             }
 
-            // look for orphans
+            // Look for orphans that belong
             if(node.kind == "directory"){
                 for(const orphan of this._data.orphaned_nodes){
                     if(orphan.parent_uri==node.uri){
@@ -157,18 +155,22 @@ export default class DataManager {
             }
         }
 
-        async load_page_by_uri(uri){
-            const page_obj = this._data.nodes_by_path.get(uri);
-            const db_uri = page_obj.db_uri;
-            const page_uri = uri; // page_obj.uri
-            // => set a loading notice
+    //-- Page Loading ------------------------------------------------------------------//
+
+        async load_page_by_uri(page_uri){
             try {
+                // Close error if open
                 this._uistate.error_open = false;
-                this._data.article_uri = page_uri;
+
+                // Find the page node and get the db_uri
+                const page_obj = this._data.nodes_by_uri.get(page_uri);
+                const db_uri = page_obj.db_uri;
+
+                // Fetch and set info
+                this._data.current_uri = page_uri;
                 const resp = await window.fetch(`db/${db_uri}?h=${random_string()}`);
-                // => clear loading notice
                 const text = await resp.text();
-                this._data.article_html = text;
+                this._data.current_html = text;
             }catch(err){
                 console.error("Error loading page:",page_uri,err);
                 this._uistate.error_open = true;
@@ -178,6 +180,7 @@ export default class DataManager {
             // Update the hash location
             window.location.hash = page_uri;
 
+            // If we are mobile, make sure to close the nav tray
             if(this._uistate.is_mobile){
                 this._uistate.show_nav = false; }
         }

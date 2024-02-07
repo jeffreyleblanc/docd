@@ -11,7 +11,7 @@ SPDX-License-Indentifier: MIT
             {{error_msg}}
         </div>
         <section ref="article_container" class="ui-child-expand ui-parent-col overflow-y-scroll">
-            <article class="grow px-4 pt-8 pb-16 md:w-[42rem] md:self-center md:px-0 md:pt-12 md:pb-24 docd-article" v-html="article_html" />
+            <article class="grow px-4 pt-8 pb-16 md:w-[42rem] md:self-center md:px-0 md:pt-12 md:pb-24 docd-article" v-html="current_html" />
             <ArticleFooter/>
         </section>
     </div>
@@ -27,12 +27,12 @@ export default {
     components: { ArticleHeader, ArticleFooter },
     watch: {
         // When we set a new article, make sure we are at the top
-        article_html(new_val,old_val){
+        current_html(new_val,old_val){
             this.$refs.article_container.scrollTop = 0;
         }
     },
     computed: {
-        article_html(){ return this.$M.data.article_html; },
+        current_html(){ return this.$M.data.current_html; },
         error_open(){ return this.$M.uistate.error_open; },
         error_msg(){ return this.$M.uistate.error_msg; }
     }

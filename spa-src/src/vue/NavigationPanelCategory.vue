@@ -18,16 +18,16 @@ SPDX-License-Indentifier: MIT
             v-for="child in node.directories"
             :key="child.display_name"
             :node="child"
-            :article_uri="article_uri"
+            :current_uri="current_uri"
         />
 
         <div class="border-l pl-4 py-0.5"
-            :class="(page.uri==article_uri)?'th-accent-border':'th-core-border-base'"
+            :class="(page.uri==current_uri)?'th-accent-border':'th-core-border-base'"
             v-for="page in node.files"
             :key="page.display_name"
         >
             <span class="cursor-pointer"
-                  :class="(page.uri==article_uri)?'th-accent-text font-medium':'th-core-text-muted'"
+                  :class="(page.uri==current_uri)?'th-accent-text font-medium':'th-core-text-muted'"
                   @click="load_page(page)"
             >
                 {{page.display_name}}
@@ -51,7 +51,7 @@ export default {
             default: true
         },
         node: Object,
-        article_uri: String
+        current_uri: String
     },
     components: { IconCaretRight, IconCaretDown },
     computed: {

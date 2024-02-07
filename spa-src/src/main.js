@@ -20,7 +20,6 @@ function main(){
 
     // Make a data manager
     G.mng = new DataManager(config);
-    G.mng.setup_theme();
 
     // Create the main app and mount it
     G.app = createApp(MainApp);
