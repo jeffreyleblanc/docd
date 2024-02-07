@@ -55,7 +55,7 @@ class DocNode:
 
 class Publisher:
 
-    def __init__(self, ctx, site_config):
+    def __init__(self, ctx, site_config, max_directory_depth=2):
         # Save the config
         self.site_config = site_config
 
@@ -71,7 +71,8 @@ class Publisher:
         _template_lookup = TemplateLookup(directories=[_template_dir])
         self.SPA_TEMPLATE = _template_lookup.get_template("spa.html")
 
-        # Holder for
+        # Depth and Holder for nodes
+        self.max_directory_depth = max_directory_depth
         self.doc_nodes = []
 
     #-- Build --------------------------------------------------------#
@@ -119,7 +120,7 @@ class Publisher:
 
         # Parse the docs directory
         self.doc_nodes = []
-        root_node = self._unpack_dirs(self.SOURCE_ROOT,max_depth=2)
+        root_node = self._unpack_dirs(self.SOURCE_ROOT,max_depth=self.max_directory_depth)
 
         # Write out the page database to a json file
         with Path(self.DEST_ROOT_DB/"page-db.json").open("w") as f:
@@ -177,11 +178,11 @@ class Publisher:
             if child_path.is_dir() and child_path.name in SKIP_DIRECTORIES:
                 continue
 
-            # Get the relative child_path
-            child_relpath = child_path.relative_to(self.SOURCE_ROOT)
-
             # If this is a file, add entry
             if child_path.is_file():
+
+                # Get the relative child_path
+                child_relpath = child_path.relative_to(self.SOURCE_ROOT)
 
                 # Pull out path components
                 relpath_parent = child_relpath.parent
