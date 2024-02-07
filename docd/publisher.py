@@ -40,7 +40,8 @@ FILE_MAP = {
     ".bash":"bash",
     ".vue":"html",
     ".js":"javascript",
-    ".css":"css"
+    ".css":"css",
+    ".conf":"bash"
 }
 
 SKIP_DIRECTORIES = (".git","_output","_media")
@@ -99,7 +100,7 @@ class Publisher:
         self._build_setup()
         self.DEST_ROOT_DB.mkdir(exist_ok=True)
 
-        # NEW: Support Media
+        # Synchronize the media folder
         media_src = self.SOURCE_ROOT/"_media"
         if media_src.is_dir():
             media_dest = self.DEST_ROOT/"_media"
@@ -109,150 +110,82 @@ class Publisher:
                 print(c,o,e)
                 raise Exception("Rsync of _media failed")
 
-        print("Begin new file parser")
-
+        # Parse the docs directory
         self.flat_file_map = {}
-
-        def _unpack_dirs(SOURCE_ROOT, depth=0, max_depth=100000):
-            indent = " "*(4*depth)
-            print(f"{indent}UNPACK",SOURCE_ROOT.name,depth)
-
-            node = {
-                "depth": depth,
-                "kind": "directory",
-                "path": str(SOURCE_ROOT.relative_to(self.SOURCE_ROOT)),
-                "name": SOURCE_ROOT.name,
-                "files": [],
-                "directories": []
-            }
-
-            # Traverse the sources
-            srcs = sorted([s for s in SOURCE_ROOT.iterdir()])
-            for path in srcs:
-                # Ignore skipped directories (Note should make deep path support)
-                if path.is_dir() and path.name in SKIP_DIRECTORIES:
-                    continue
-
-                relpath = path.relative_to(self.SOURCE_ROOT)
-
-                if path.is_file():
-                    uriupp = relpath.parent
-                    uri = str(uriupp/path.stem)
-                    if path.suffix != ".md":
-                        uri += f"--dot-{path.suffix[1:]}"
-
-                    fnode = {
-                        "depth": depth,
-                        "kind": "file",
-                        "path": str(relpath),
-                        "name": path.name,
-                        "stem": path.stem,
-                        "suffix": path.suffix,
-                        "db_file_path": None,
-                        "uri": uri
-                    }
-                    node["files"].append(fnode)
-                    self.flat_file_map[str(relpath)] = fnode
-                elif path.is_dir() and depth+1 <= max_depth:
-                    subnode = _unpack_dirs(path,depth=depth+1,max_depth=max_depth)
-                    node["directories"].append(subnode)
-
-            return node
-
-
-        root_node = _unpack_dirs(self.SOURCE_ROOT,max_depth=2)
-        print("-"*32)
-        print(json.dumps(root_node,indent=4))
-        print(json.dumps(self.flat_file_map,indent=4))
-
-        return
-
-        ## Reset Paths #########################################
-
-        self.all_paths_list = []
-
-        ## Process the Directories #########################################
-
-        # Break this into chunks
-
-        # Make the main page
-        main_page = self.SOURCE_ROOT/"__main__.md"
-        if main_page.is_file():
-            main_source = main_page.read_text()
-        else:
-            main_source = "Some documentation."
-        main_html = make_html(main_source)
-        with Path(self.DEST_ROOT_DB/"__main__.html").open("w") as f:
-            f.write(main_html)
-
-        # Traverse the sources
-        srcs = sorted([s for s in self.SOURCE_ROOT.iterdir()])
-        for srcdir in srcs:
-            # Ignore files in root directory
-            if not srcdir.is_dir():
-                continue
-            # Ignore more files
-            if srcdir.name in SKIP_DIRECTORIES:
-                continue
-
-            # Render found files
-            self._process_directory(srcdir,srcdir.name,FILE_MAP)
-
-        ## Make database #########################################
-
-        # Make the index database
-        page_database = []
-        curr_pages = None
-        for item in self.all_paths_list:
-            if item.kind == "category":
-                curr_pages = []
-                page_database.append({
-                    "kind":"category",
-                    "name":item.name,
-                    "pages":curr_pages
-                })
-            else:
-                curr_pages.append({
-                    "name":item.name,
-                    "uri":item.uri
-                })
+        root_node = self._unpack_dirs(self.SOURCE_ROOT,max_depth=2)
 
         # Write out the page database to a json file
         with Path(self.DEST_ROOT_DB/"page-db.json").open("w") as f:
-            db = json.dumps(page_database,indent=4)
+            db = json.dumps(root_node,indent=4)
             f.write(db)
 
-    #-- Helpers ----------------------------------------------------------------#
+        # Render the pages
+        for filepath,info in self.flat_file_map.items():
+            # Determine paths
+            source = self.SOURCE_ROOT/filepath
+            dest = self.DEST_ROOT_DB/info["db_file_path"]
 
-    def _process_directory(self, source_directory, out_uri, suffix_lang_map):
-        # Make the target directory
-        TGT = self.DEST_ROOT_DB/out_uri
-        TGT.mkdir(exist_ok=True)
+            # Ensure the folder exists
+            dest.parent.mkdir(parents=True,exist_ok=True)
 
-        self.all_paths_list.append(Category(name=out_uri))
-
-        # Gather all filenames
-        sources = []
-        for s in source_directory.iterdir():
-            if s.suffix not in suffix_lang_map: continue
-            sources.append(FileRep(
-                name= s.stem,
-                source= s,
-                dest= TGT/f"{s.stem}.html",
-                uri= f"/{out_uri}/{s.stem}.html"
-            ))
-        sources.sort(key=lambda e: e.name)
-        self.all_paths_list += sources
-
-        # Generate the files
-        for item in sources:
             # Add the contents
-            language = suffix_lang_map.get(item.source.suffix)
-            content = self._render_page(item.source,language)
+            language = FILE_MAP.get(source.suffix,"")
+            content = self._render_page(source,language)
 
             # Write the file
-            with item.dest.open("w") as f:
+            with dest.open("w") as f:
                 f.write(content)
+
+
+    def _unpack_dirs(self, SOURCE_ROOT, depth=0, max_depth=100000):
+        indent = " "*(4*depth)
+        # print(f"{indent}UNPACK",SOURCE_ROOT.name,depth)
+
+        node = {
+            "depth": depth,
+            "kind": "directory",
+            "path": str(SOURCE_ROOT.relative_to(self.SOURCE_ROOT)),
+            "name": SOURCE_ROOT.name,
+            "files": [],
+            "directories": []
+        }
+
+        # Traverse the sources
+        srcs = sorted([s for s in SOURCE_ROOT.iterdir()])
+        for path in srcs:
+            # Ignore skipped directories (Note should make deep path support)
+            if path.is_dir() and path.name in SKIP_DIRECTORIES:
+                continue
+
+            # Get the relative path
+            relpath = path.relative_to(self.SOURCE_ROOT)
+
+            # If this is a file, add entry
+            if path.is_file():
+                uriupp = relpath.parent
+                uri = str(uriupp/path.stem)
+                if path.suffix != ".md":
+                    uri += f"--dot-{path.suffix[1:]}"
+
+                fnode = {
+                    "depth": depth,
+                    "kind": "file",
+                    "path": str(relpath),
+                    "name": path.name,
+                    "stem": path.stem,
+                    "suffix": path.suffix,
+                    "db_file_path": uri+".html",
+                    "uri": uri
+                }
+                node["files"].append(fnode)
+                self.flat_file_map[str(relpath)] = fnode
+            # If this is a directory, parse or return
+            elif path.is_dir() and depth+1 <= max_depth:
+                subnode = self._unpack_dirs(path,depth=depth+1,max_depth=max_depth)
+                node["directories"].append(subnode)
+
+        return node
+
 
     def _render_page(self, source_path, language):
         if language == "markdown":
