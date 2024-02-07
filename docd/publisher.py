@@ -14,33 +14,6 @@ from docd.utils.markdown2html import make_html
 from docd.utils.proc import rsync
 from docd.utils.filetools import clear_directory
 
-@dataclass
-class Category:
-    kind =  "category"
-    name:   str = None
-    uri:    str = None
-    # parent_path
-
-@dataclass
-class FileRep:
-    kind =  "file"
-    name:   str = None
-    source: Path = None
-    dest:   Path = None
-    uri:    str = None
-    # parent_path
-
-"""
-kind:           "directory" or "file"
-uri:            this is the visible uri for the page
-                this functions as the primary key
-parent_uri:     this is uri of the "parent" or null if none
-db_uri:         this is the uri for the page source file in the database
-source_path:    this is the relative filepath in the docs raw source
-display_name:   this is the name of the directory or file as displayed in the SPA
-display_suffix: this is the suffix, if applicable, to be displayed in the SPA
-"""
-
 
 FILE_MAP = {
     ".md":"markdown",
@@ -56,6 +29,29 @@ FILE_MAP = {
 }
 
 SKIP_DIRECTORIES = (".git","_output","_media")
+
+@dataclass
+class DocNode:
+    kind: str                       # "directory" or "file"
+    uri: Path                       # this is the visible uri for the page. this functions as the primary key
+    parent_uri: Path                # this is uri of the "parent" or null if none
+    depth: int
+    db_uri: Path                    # this is the uri for the page source file in the database
+    source_path: Path               # this is the relative filepath in the docs raw source
+    display_name: str               # this is the name of the directory or file as displayed in the SPA
+    display_suffix: str = None      # this is the suffix, if applicable, to be displayed in the SPA
+
+    def to_dict(self):
+        return {
+            "kind": self.kind,
+            "uri": str(self.uri),
+            "parent_uri": None if self.parent_uri is None else str(self.parent_uri),
+            "depth": self.depth,
+            "db_uri": str(self.db_uri),
+            "source_path": str(self.source_path),
+            "display_name": self.display_name,
+            "display_suffix": self.display_suffix
+        }
 
 class Publisher:
 
@@ -75,8 +71,8 @@ class Publisher:
         _template_lookup = TemplateLookup(directories=[_template_dir])
         self.SPA_TEMPLATE = _template_lookup.get_template("spa.html")
 
-        # Initialize all paths
-        self.all_paths_list = []
+        # Holder for
+        self.doc_nodes = []
 
     #-- Build --------------------------------------------------------#
 
@@ -122,23 +118,22 @@ class Publisher:
                 raise Exception("Rsync of _media failed")
 
         # Parse the docs directory
-        self.flat_file_map = {}
-        self.LIST = []
+        self.doc_nodes = []
         root_node = self._unpack_dirs(self.SOURCE_ROOT,max_depth=2)
 
         # Write out the page database to a json file
         with Path(self.DEST_ROOT_DB/"page-db.json").open("w") as f:
-            db = json.dumps(self.LIST,indent=4)
+            db = json.dumps([ e.to_dict() for e in self.doc_nodes ],indent=4)
             f.write(db)
 
         # Render the pages
-        for info in self.LIST:
-            if info["kind"] == "directory":
+        for info in self.doc_nodes:
+            if info.kind == "directory":
                 continue
 
             # Determine paths
-            source = self.SOURCE_ROOT/info["source_path"]
-            dest = self.DEST_ROOT_DB/info["db_uri"]
+            source = self.SOURCE_ROOT/info.source_path
+            dest = self.DEST_ROOT_DB/info.db_uri
 
             # Ensure the folder exists
             dest.parent.mkdir(parents=True,exist_ok=True)
@@ -160,17 +155,28 @@ class Publisher:
         _p_uri = str(curr_path.parent)
         if str(curr_path) == ".":
             _p_uri = None
-        NODE = {
-            "kind": "directory",
-            "uri": str(curr_path),
-            "parent_uri": _p_uri,
-            "depth": depth,
-            "db_uri": str(curr_path),
-            "source_path": str(curr_path),
-            "display_name": curr_path.name.replace("--",":"),
-            "display_suffix": None
-        }
-        self.LIST.append(NODE)
+
+        NODE = DocNode(
+            kind = "directory",
+            uri = curr_path,
+            parent_uri = _p_uri,
+            depth = depth,
+            db_uri = curr_path,
+            source_path = curr_path,
+            display_name = curr_path.name.replace("--",":"),
+            display_suffix = None
+        )
+        # NODE = {
+        #     "kind": "directory",
+        #     "uri": str(curr_path),
+        #     "parent_uri": _p_uri,
+        #     "depth": depth,
+        #     "db_uri": str(curr_path),
+        #     "source_path": str(curr_path),
+        #     "display_name": curr_path.name.replace("--",":"),
+        #     "display_suffix": None
+        # }
+        self.doc_nodes.append(NODE)
 
         # Traverse the sources
         srcs = sorted([s for s in SOURCE_ROOT.iterdir()])
@@ -195,17 +201,27 @@ class Publisher:
                 else:
                     _stem += f"--dot-{_suffix[1:]}"
 
-                FNODE = {
-                    "kind": "file",
-                    "uri": str(relpath_parent/_stem),
-                    "parent_uri": str(relpath.parent),
-                    "depth": depth,
-                    "db_uri": str(relpath_parent/_stem)+".html",
-                    "source_path": str(relpath),
-                    "display_name": relpath.stem.replace("--",":"),
-                    "display_suffix": _suffix
-                }
-                self.LIST.append(FNODE)
+                # FNODE = {
+                #     "kind": "file",
+                #     "uri": str(relpath_parent/_stem),
+                #     "parent_uri": str(relpath.parent),
+                #     "depth": depth,
+                #     "db_uri": str(relpath_parent/_stem)+".html",
+                #     "source_path": str(relpath),
+                #     "display_name": relpath.stem.replace("--",":"),
+                #     "display_suffix": _suffix
+                # }
+                FNODE = DocNode(
+                    kind = "file",
+                    uri = relpath_parent/_stem,
+                    parent_uri = relpath.parent,
+                    depth = depth,
+                    db_uri = relpath_parent/f"{_stem}.html",
+                    source_path = relpath,
+                    display_name = relpath.stem.replace("--",":"),
+                    display_suffix = _suffix
+                )
+                self.doc_nodes.append(FNODE)
 
             # If this is a directory, parse or return
             elif path.is_dir() and depth+1 <= max_depth:
