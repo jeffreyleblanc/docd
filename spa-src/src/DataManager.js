@@ -20,7 +20,9 @@ export default class DataManager {
             name: config.name,
             footer_text: config.footer_text,
             home_addr: config.home_addr,
-            side_entries: [],
+            root_node: null,
+            nodes_by_path: new Map(),
+            orphaned_nodes: new Set(),
             article_uri: "",
             article_html: ""
         });
@@ -112,11 +114,51 @@ export default class DataManager {
             const resp = await window.fetch(`db/page-db.json?h=${random_string()}`);
             const page_db_obj = await resp.json();
             console.log("fetch_database:resp",page_db_obj);
-            this._data.side_entries = page_db_obj;
+            // this._data.side_entries = page_db_obj;
+            page_db_obj.forEach(e=>this.process_node(e));
+        }
+
+        process_node(node){
+            console.log("Process",node.uri)
+            const uri = node.uri;
+            if(node.kind == "directory"){
+                node.files = [];
+                node.directories = [];
+            }
+            this._data.nodes_by_path.set(uri,node);
+            if(node.parent_uri){
+                const parent = this._data.nodes_by_path.get(node.parent_uri)||null;
+                if(parent==null){
+                    this._data.orphaned_nodes.add(node)
+                }else{
+                    if(node.kind=="file"){
+                        parent.files.push(node);
+                    }else{
+                        parent.directories.push(node);
+                    }
+                }
+            }
+            if(uri == "."){
+                this._data.root_node = node;
+            }
+
+            // look for orphans
+            if(node.kind == "directory"){
+                for(const orphan of this._data.orphaned_nodes){
+                    if(orphan.parent_uri==node.uri){
+                        if(orphan.kind=="file"){
+                            node.files.push(orphan);
+                        }else{
+                            node.directories.push(orphan);
+                        }
+                    }
+                    this._data.orphaned_nodes.delete(orphan)
+                }
+            }
         }
 
         async load_page(page_obj){
-            const db_uri = page_obj.db_file_path;
+            const db_uri = page_obj.db_uri;
             const page_uri = page_obj.uri
             // => set a loading notice
             try {

@@ -31,7 +31,6 @@ class FileRep:
     # parent_path
 
 """
-
 kind:           "directory" or "file"
 uri:            this is the visible uri for the page
                 this functions as the primary key
@@ -40,33 +39,6 @@ db_uri:         this is the uri for the page source file in the database
 source_path:    this is the relative filepath in the docs raw source
 display_name:   this is the name of the directory or file as displayed in the SPA
 display_suffix: this is the suffix, if applicable, to be displayed in the SPA
-
-for uri, the root directory has `uri=""` and `parent_uri=null`
-
-{
-    kind: "directory",
-    path: ".",
-    parent_path: "",
-    name: "",
-    display_name: "",
-    display_uri: "",
-    db_file_uri: ""
-}
-
-{
-    kind: "file",
-    path: ""
-    parent_path: "",
-    name: "",
-    stem: "",
-    suffix: "",
-    display_name: "",
-    display_suffix: "",
-    display_uri: "",
-    db_file_uri: ""
-}
-
-
 """
 
 
@@ -154,21 +126,19 @@ class Publisher:
         self.LIST = []
         root_node = self._unpack_dirs(self.SOURCE_ROOT,max_depth=2)
 
-        for e in self.LIST:
-            print(json.dumps(e,indent=4))
-
-        return
-
         # Write out the page database to a json file
         with Path(self.DEST_ROOT_DB/"page-db.json").open("w") as f:
-            db = json.dumps(root_node,indent=4)
+            db = json.dumps(self.LIST,indent=4)
             f.write(db)
 
         # Render the pages
-        for filepath,info in self.flat_file_map.items():
+        for info in self.LIST:
+            if info["kind"] == "directory":
+                continue
+
             # Determine paths
-            source = self.SOURCE_ROOT/filepath
-            dest = self.DEST_ROOT_DB/info["db_file_path"]
+            source = self.SOURCE_ROOT/info["source_path"]
+            dest = self.DEST_ROOT_DB/info["db_uri"]
 
             # Ensure the folder exists
             dest.parent.mkdir(parents=True,exist_ok=True)
@@ -186,20 +156,14 @@ class Publisher:
         indent = " "*(4*depth)
         # print(f"{indent}UNPACK",SOURCE_ROOT.name,depth)
 
-        node = {
-            "depth": depth,
-            "kind": "directory",
-            "path": str(SOURCE_ROOT.relative_to(self.SOURCE_ROOT)),
-            "name": SOURCE_ROOT.name,
-            "files": [],
-            "directories": []
-        }
-
         curr_path = SOURCE_ROOT.relative_to(self.SOURCE_ROOT)
+        _p_uri = str(curr_path.parent)
+        if str(curr_path) == ".":
+            _p_uri = None
         NODE = {
             "kind": "directory",
             "uri": str(curr_path),
-            "parent_uri": str(curr_path.parent),
+            "parent_uri": _p_uri,
             "depth": depth,
             "db_uri": str(curr_path),
             "source_path": str(curr_path),
@@ -220,23 +184,6 @@ class Publisher:
 
             # If this is a file, add entry
             if path.is_file():
-                # uriupp = relpath.parent
-                # uri = str(uriupp/path.stem)
-                # if path.suffix != ".md":
-                #     uri += f"--dot-{path.suffix[1:]}"
-
-                # fnode = {
-                #     "depth": depth,
-                #     "kind": "file",
-                #     "path": str(relpath),
-                #     "name": path.name,
-                #     "stem": path.stem,
-                #     "suffix": path.suffix,
-                #     "db_file_path": uri+".html",
-                #     "uri": uri
-                # }
-                # node["files"].append(fnode)
-                # self.flat_file_map[str(relpath)] = fnode
 
                 relpath_parent = relpath.parent
                 _name = relpath.name
@@ -260,13 +207,9 @@ class Publisher:
                 }
                 self.LIST.append(FNODE)
 
-
             # If this is a directory, parse or return
             elif path.is_dir() and depth+1 <= max_depth:
                 subnode = self._unpack_dirs(path,depth=depth+1,max_depth=max_depth)
-                node["directories"].append(subnode)
-
-        return node
 
 
     def _render_page(self, source_path, language):

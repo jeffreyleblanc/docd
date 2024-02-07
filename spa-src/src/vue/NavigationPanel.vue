@@ -50,16 +50,10 @@ SPDX-License-Indentifier: MIT
     </header>
 
     <section class="ui-child-expand ui-parent-col gap-y-1 px-4 py-8 overflow-y-scroll">
-        <!-- <pre v-html="JSON.stringify(side_entries,null,'  ')"/> -->
-        <!-- <NavigationPanelCategory
-            v-for="category in side_entries"
-            ref="category_entries"
-            :key="category.name"
-            :category="category"
-            :article_uri="article_uri"
-        /> -->
         <NavigationPanelCategory
-            :node="side_entries"
+            v-if="root_node!=null"
+            :node="root_node"
+            :deep="false"
             :article_uri="article_uri"
         />
     </section>
@@ -98,7 +92,7 @@ export default {
             get(){ return this.$M.uistate.map_open; },
             set(val){ this.$M.uistate.map_open = val; }
         },
-        side_entries(){ return this.$M.data.side_entries; },
+        root_node(){ return this.$M.data.root_node; },
         theme: {
             get(){ return this.$M.uistate.theme; },
             set(val){ this.$M.set_theme(val); }
