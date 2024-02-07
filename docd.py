@@ -22,7 +22,7 @@ class DocdRunContext:
 
 
 if __name__ == "__main__":
-    __VERSION__ = "0.0.2"
+    __VERSION__ = "0.0.3"
 
     #-- Make the argparser -----------------------------------------------------------#
 
