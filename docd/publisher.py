@@ -30,6 +30,45 @@ class FileRep:
     uri:    str = None
     # parent_path
 
+"""
+
+kind:           "directory" or "file"
+uri:            this is the visible uri for the page
+                this functions as the primary key
+parent_uri:     this is uri of the "parent" or null if none
+db_uri:         this is the uri for the page source file in the database
+source_path:    this is the relative filepath in the docs raw source
+display_name:   this is the name of the directory or file as displayed in the SPA
+display_suffix: this is the suffix, if applicable, to be displayed in the SPA
+
+for uri, the root directory has `uri=""` and `parent_uri=null`
+
+{
+    kind: "directory",
+    path: ".",
+    parent_path: "",
+    name: "",
+    display_name: "",
+    display_uri: "",
+    db_file_uri: ""
+}
+
+{
+    kind: "file",
+    path: ""
+    parent_path: "",
+    name: "",
+    stem: "",
+    suffix: "",
+    display_name: "",
+    display_suffix: "",
+    display_uri: "",
+    db_file_uri: ""
+}
+
+
+"""
+
 
 FILE_MAP = {
     ".md":"markdown",
@@ -112,7 +151,13 @@ class Publisher:
 
         # Parse the docs directory
         self.flat_file_map = {}
+        self.LIST = []
         root_node = self._unpack_dirs(self.SOURCE_ROOT,max_depth=2)
+
+        for e in self.LIST:
+            print(json.dumps(e,indent=4))
+
+        return
 
         # Write out the page database to a json file
         with Path(self.DEST_ROOT_DB/"page-db.json").open("w") as f:
@@ -150,6 +195,19 @@ class Publisher:
             "directories": []
         }
 
+        curr_path = SOURCE_ROOT.relative_to(self.SOURCE_ROOT)
+        NODE = {
+            "kind": "directory",
+            "uri": str(curr_path),
+            "parent_uri": str(curr_path.parent),
+            "depth": depth,
+            "db_uri": str(curr_path),
+            "source_path": str(curr_path),
+            "display_name": curr_path.name.replace("--",":"),
+            "display_suffix": None
+        }
+        self.LIST.append(NODE)
+
         # Traverse the sources
         srcs = sorted([s for s in SOURCE_ROOT.iterdir()])
         for path in srcs:
@@ -162,23 +220,47 @@ class Publisher:
 
             # If this is a file, add entry
             if path.is_file():
-                uriupp = relpath.parent
-                uri = str(uriupp/path.stem)
-                if path.suffix != ".md":
-                    uri += f"--dot-{path.suffix[1:]}"
+                # uriupp = relpath.parent
+                # uri = str(uriupp/path.stem)
+                # if path.suffix != ".md":
+                #     uri += f"--dot-{path.suffix[1:]}"
 
-                fnode = {
-                    "depth": depth,
+                # fnode = {
+                #     "depth": depth,
+                #     "kind": "file",
+                #     "path": str(relpath),
+                #     "name": path.name,
+                #     "stem": path.stem,
+                #     "suffix": path.suffix,
+                #     "db_file_path": uri+".html",
+                #     "uri": uri
+                # }
+                # node["files"].append(fnode)
+                # self.flat_file_map[str(relpath)] = fnode
+
+                relpath_parent = relpath.parent
+                _name = relpath.name
+                _stem = relpath.stem
+                _suffix = relpath.suffix
+
+                if _suffix == ".md" or _suffix == "":
+                    _suffix = ""
+                else:
+                    _stem += f"--dot-{_suffix[1:]}"
+
+                FNODE = {
                     "kind": "file",
-                    "path": str(relpath),
-                    "name": path.name,
-                    "stem": path.stem,
-                    "suffix": path.suffix,
-                    "db_file_path": uri+".html",
-                    "uri": uri
+                    "uri": str(relpath_parent/_stem),
+                    "parent_uri": str(relpath.parent),
+                    "depth": depth,
+                    "db_uri": str(relpath_parent/_stem)+".html",
+                    "source_path": str(relpath),
+                    "display_name": relpath.stem.replace("--",":"),
+                    "display_suffix": _suffix
                 }
-                node["files"].append(fnode)
-                self.flat_file_map[str(relpath)] = fnode
+                self.LIST.append(FNODE)
+
+
             # If this is a directory, parse or return
             elif path.is_dir() and depth+1 <= max_depth:
                 subnode = self._unpack_dirs(path,depth=depth+1,max_depth=max_depth)
