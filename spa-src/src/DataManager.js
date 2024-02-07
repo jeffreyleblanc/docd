@@ -24,6 +24,7 @@ export default class DataManager {
             // Page Node Data
             root_node: null,
             nodes_by_uri: new Map(),
+            directory_nodes_by_uri: new Map(),
             orphaned_nodes: new Set(),
             // Current data
             current_uri: "",
@@ -89,6 +90,12 @@ export default class DataManager {
                 document.documentElement.classList.remove("dark");
         }
 
+        toggle_all_directories(state){
+            for(const d of this._data.directory_nodes_by_uri.values()){
+                d._is_open = state;
+            }
+        }
+
     //-- Data --------------------------------------------//
 
         async start(){
@@ -113,13 +120,16 @@ export default class DataManager {
             const uri = node.uri;
 
             // If it's a directory, add containers for children
-            if(node.kind == "directory"){
+            if("directory" == node.kind){
                 node.files = [];
                 node.directories = [];
+                node._is_open = true;
             }
 
             // Save the node by uri
             this._data.nodes_by_uri.set(uri,node);
+            if("directory" == node.kind){
+                this._data.directory_nodes_by_uri.set(uri,node); }
 
             // Add to it's parent, or set as orphaned
             if(node.parent_uri){
@@ -127,7 +137,7 @@ export default class DataManager {
                 if(parent==null){
                     this._data.orphaned_nodes.add(node)
                 }else{
-                    if(node.kind=="file"){
+                    if("file" == node.kind){
                         parent.files.push(node);
                     }else{
                         parent.directories.push(node);
@@ -141,10 +151,10 @@ export default class DataManager {
             }
 
             // Look for orphans that belong
-            if(node.kind == "directory"){
+            if("directory" == node.kind){
                 for(const orphan of this._data.orphaned_nodes){
                     if(orphan.parent_uri==node.uri){
-                        if(orphan.kind=="file"){
+                        if("file" == orphan.kind){
                             node.files.push(orphan);
                         }else{
                             node.directories.push(orphan);

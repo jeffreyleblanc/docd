@@ -104,10 +104,10 @@ export default {
     methods: {
         // pass
         open_all(){
-            this.$refs.category_entries.forEach(e=>{e.open=true})
+            this.$M.toggle_all_directories(true);
         },
         close_all(){
-            this.$refs.category_entries.forEach(e=>{e.open=false})
+            this.$M.toggle_all_directories(false);
         }
     }
 }

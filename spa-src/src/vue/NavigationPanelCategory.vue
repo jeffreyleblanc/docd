@@ -43,7 +43,7 @@ import IconCaretDown from "./icons/IconCaretDown.vue"
 
 export default {
     data(){ return {
-        open: true
+        // open: true
     } },
     props: {
         deep: {
@@ -55,7 +55,11 @@ export default {
     },
     components: { IconCaretRight, IconCaretDown },
     computed: {
-        is_open(){ return (!this.deep)?true:this.open; }
+        is_open(){ return (!this.deep)?true:this.open; },
+        open: {
+            get(){ return this.node._is_open; },
+            set(val){ this.node._is_open = val; }
+        }
     },
     methods: {
         load_page(page_obj){
