@@ -115,12 +115,14 @@ export default class DataManager {
             this._data.side_entries = page_db_obj;
         }
 
-        async load_page(page_uri){
+        async load_page(page_obj){
+            const db_uri = page_obj.db_file_path;
+            const page_uri = page_obj.uri
             // => set a loading notice
             try {
                 this._uistate.error_open = false;
                 this._data.article_uri = page_uri;
-                const resp = await window.fetch(`db${page_uri}?h=${random_string()}`);
+                const resp = await window.fetch(`db/${db_uri}?h=${random_string()}`);
                 // => clear loading notice
                 const text = await resp.text();
                 this._data.article_html = text;

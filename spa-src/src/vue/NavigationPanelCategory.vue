@@ -10,18 +10,25 @@ SPDX-License-Indentifier: MIT
         >
             <IconCaretDown v-if="open" class="sq-3 th-accent-text-muted"/>
             <IconCaretRight v-if="!open" class="sq-3 th-accent-text-muted"/>
-            <span class="font-semibold th-core-text-pop">{{category.name}}</span>
+            <span class="font-semibold th-core-text-pop">{{node.name}}</span>
         </span>
     </div>
     <div v-if="open" class="pl-6 flex flex-col">
+        <NavigationPanelCategory
+            v-for="child in node.directories"
+            :key="child.name"
+            :node="child"
+            :article_uri="article_uri"
+        />
+
         <div class="border-l pl-4 py-0.5"
             :class="(page.uri==article_uri)?'th-accent-border':'th-core-border-base'"
-            v-for="page in category.pages"
+            v-for="page in node.files"
             :key="page.name"
         >
             <span class="cursor-pointer"
                   :class="(page.uri==article_uri)?'th-accent-text font-medium':'th-core-text-muted'"
-                  @click="load_page(page.uri)"
+                  @click="load_page(page)"
             >
                 {{page.name}}
             </span>
@@ -43,13 +50,13 @@ export default {
         open: true
     } },
     props: {
-        category: Object,
+        node: Object,
         article_uri: String
     },
     components: { IconChevronRight, IconChevronDown, IconCaretRight, IconCaretDown },
     methods: {
-        load_page(uri){
-            this.$M.load_page(uri);
+        load_page(page_obj){
+            this.$M.load_page(page_obj);
         }
     }
 }
