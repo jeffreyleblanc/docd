@@ -13,6 +13,7 @@ from docd.utils.obj import DictObj
 
 @dataclass
 class DocdRunContext:
+    IN_DOCD_SOURCE_REPO: bool = False
     SUPPORT_RESOURCES_DIRPATH: Path = None
     # Docs info
     DOCS_REPO_DIRPATH: Path = None
@@ -123,8 +124,10 @@ if __name__ == "__main__":
     # and then set support paths accordingly
     _here = Path(__file__).parent
     if _here == Path("/usr/local/bin"):
+        ctx.IN_DOCD_SOURCE_REPO = False
         ctx.SUPPORT_RESOURCES_DIRPATH = Path("/usr/local/lib/docd/support/")
     else:
+        ctx.IN_DOCD_SOURCE_REPO = True
         ctx.SUPPORT_RESOURCES_DIRPATH = _here/"support/"
     assert ctx.SUPPORT_RESOURCES_DIRPATH.is_dir()
 
