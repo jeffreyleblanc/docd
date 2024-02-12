@@ -79,6 +79,14 @@ _dist/ # Will get build by docd for you
 The `docd.toml` file should look like:
 
 ```yaml
+# optional
+[source]
+max_depth = 3 # default is 2. this is max directory depth that is parsed
+[source.file_types]
+".md"= "markdown"
+".py" = "python"
+#...etc, see `docd.py` for default list
+
 [site]
 name = "Joe's Docs"
 title= "Joe's Code Documentation"

@@ -21,6 +21,56 @@ class DocdRunContext:
     DOCS_DIST_DIRPATH: Path = None
 
 
+def load_config(config_fpath):
+    # Load the config
+    config = DictObj(toml.load(config_fpath))
+
+    # Look for config dictionary
+    if "source" not in config:
+        config.source = DictObj({})
+    if "max_depth" not in config.source:
+        config.source.max_depth = 2
+    if not isinstance(config.source.max_depth,int):
+        raise Exception("config.config.max_depth must be an integer")
+    if "file_types" not in config.source:
+        config.file_types = {
+            ".md":"markdown",
+            ".py":"python",
+            ".txt":"",
+            ".html":"html",
+            ".sh":"bash",
+            ".bash":"bash",
+            ".vue":"html",
+            ".js":"javascript",
+            ".css":"css",
+            ".conf":"bash",
+            "":""
+        }
+
+    # Make sure we have the 'site' attributes
+    for k in ( "site.title","site.name","site.footer" ):
+        if config.get_path(k) is None:
+            raise Exception(f"docd.toml missing `{k}`")
+    if "home_addr" not in config.site:
+        config.site.home_addr = ""
+
+    # Check on 'remote' attributes
+    if "remote" not in config:
+        config.remote = None
+    else:
+        for k in ( "remote.user","remote.addr","remote.path" ):
+            if config.get_path(k) is None:
+                raise Exception(f"docd.toml missing `{k}`")
+
+    # Check on 'check' attributes
+    if "check" not in config:
+        config.check = DictObj({})
+    if "filter_phrases" not in config.check:
+        config.check.filter_phrases = ""
+
+    return config
+
+
 if __name__ == "__main__":
     __VERSION__ = "0.0.3"
 
@@ -89,26 +139,7 @@ if __name__ == "__main__":
     ctx.DOCS_DIST_DIRPATH = _repo/"_dist/"
 
     # Load the config
-    config = DictObj(toml.load(ctx.DOCS_CONFIG_FILEPATH))
-    # Make sure we have the 'site' attributes
-    for k in ( "site.title","site.name","site.footer" ):
-        if config.get_path(k) is None:
-            raise Exception(f"docd.toml missing `{k}`")
-    if "home_addr" not in config.site:
-        config.site.home_addr = ""
-    # Check on 'remote' attributes
-    if "remote" not in config:
-        config.remote = None
-    else:
-        for k in ( "remote.user","remote.addr","remote.path" ):
-            if config.get_path(k) is None:
-                raise Exception(f"docd.toml missing `{k}`")
-    # Check on 'check' attributes
-    if "check" not in config:
-        config.check =DictObj({})
-    if "filter_phrases" not in config.check:
-        config.check.filter_phrases = ""
-
+    config = load_config(ctx.DOCS_CONFIG_FILEPATH)
 
     #-- Execute the Commands -----------------------------------------------------------#
 
