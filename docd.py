@@ -21,6 +21,7 @@ class DocdRunContext:
     DOCS_DOCS_DIRPATH: Path = None
     DOCS_DIST_DIRPATH: Path = None
 
+DEFAULT_PORT = 8001
 
 def load_config(config_fpath):
     # Load the config
@@ -94,7 +95,7 @@ if __name__ == "__main__":
 
     # Serve
     subp_serve = subparsers.add_parser("serve", help="Serve the document")
-    subp_serve.add_argument("-p","--port", help="port", type=int, default=8001)
+    subp_serve.add_argument("-p","--port", help="port", type=int, default=DEFAULT_PORT)
     subp_serve.add_argument("--open",action="store_true",help="Open server to exterior connections")
     subp_serve.add_argument("--allowed",nargs="*",type=str,default=None)
 

@@ -37,6 +37,17 @@ class DictObj:
                 return default
         return e
 
+    def has_path(self, path):
+        parts = path.split(".")
+        parts.reverse()
+        e = self
+        while len(parts) > 0:
+            p = parts.pop()
+            e = e.get(p)
+            if not isinstance(e,DictObj) and len(parts)>0:
+                return False
+        return True
+
     def to_dict(self):
         return { k:(v.to_dict() if isinstance(v,DictObj) else v) for k,v in self.items() }
 
