@@ -159,7 +159,7 @@ if __name__ == "__main__":
 
         case ("build"|"spa"|"publish"):
             from docd.publisher import Publisher
-            pub = Publisher(ctx,config.site)
+            pub = Publisher(ctx,config)
             if args.main_command in ("build","spa"):
                 pub.build_spa()
             if args.main_command in ("build","publish"):

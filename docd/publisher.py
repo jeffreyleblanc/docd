@@ -15,19 +15,6 @@ from docd.utils.proc import rsync
 from docd.utils.filetools import clear_directory
 
 
-FILE_MAP = {
-    ".md":"markdown",
-    ".py":"python",
-    ".txt":"",
-    ".html":"html",
-    ".sh":"bash",
-    ".bash":"bash",
-    ".vue":"html",
-    ".js":"javascript",
-    ".css":"css",
-    ".conf":"bash"
-}
-
 SKIP_DIRECTORIES = (".git","_output","_media")
 
 @dataclass
@@ -55,9 +42,11 @@ class DocNode:
 
 class Publisher:
 
-    def __init__(self, ctx, site_config, max_directory_depth=2):
+    def __init__(self, ctx, config):
         # Save the config
-        self.site_config = site_config
+        self.site_config = config.site
+        self.max_directory_depth = config.source.max_depth
+        self.FILE_MAP = config.source.file_types
 
         # Establish base paths
         self.REPO_ROOT = ctx.DOCS_REPO_DIRPATH
@@ -72,7 +61,6 @@ class Publisher:
         self.SPA_TEMPLATE = _template_lookup.get_template("spa.html")
 
         # Depth and Holder for nodes
-        self.max_directory_depth = max_directory_depth
         self.doc_nodes = []
 
     #-- Build --------------------------------------------------------#
@@ -140,7 +128,7 @@ class Publisher:
             dest.parent.mkdir(parents=True,exist_ok=True)
 
             # Add the contents
-            language = FILE_MAP.get(source.suffix,"")
+            language = self.FILE_MAP.get(source.suffix,"")
             content = self._render_page(source,language)
 
             # Write the file
