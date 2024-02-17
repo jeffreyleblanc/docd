@@ -16,9 +16,4 @@ setup:
 
 build:
 	npx vite build
-	mkdir -p ../support/static
-	rm -f ../support/static/*
-	cp dist/static/*.css ../support/static/compiled.css
-	cp dist/static/*.js  ../support/static/compiled.js
-	@# May not support map file since js file name changed
-	cp dist/static/*.js.map  ../support/static/
+
