@@ -87,6 +87,8 @@ def main():
         dt = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
         stamp = f"/* built: {dt} */"
 
+        HELPERS = {}
+
         # In future we could get the md5sum within python
         for fp in DIST_SRC_DIR.iterdir():
             ## print("=>",fp)
@@ -94,7 +96,9 @@ def main():
                 print("css: ",fp)
                 c,o,e = proc(f"md5sum {fp}")
                 print("~~>",o[:12])
-                moved_file = SUPPORT_STATIC_DIR/f"docd-core-{o[:12]}.css"
+                CSS_NAME = f"docd-core-{o[:12]}.css"
+                HELPERS["docd_css_file"] = CSS_NAME
+                moved_file = SUPPORT_STATIC_DIR/CSS_NAME
                 fp.rename(moved_file)
 
                 with moved_file.open("a") as fp:
@@ -104,7 +108,9 @@ def main():
                 print("js: ",fp)
                 c,o,e = proc(f"md5sum {fp}")
                 print("~~>",o[:12])
-                moved_file = SUPPORT_STATIC_DIR/f"docd-core-{o[:12]}.js"
+                JS_NAME = f"docd-core-{o[:12]}.js"
+                HELPERS["docd_js_file"] = JS_NAME
+                moved_file = SUPPORT_STATIC_DIR/JS_NAME
                 fp.rename(moved_file)
 
                 with moved_file.open("a") as fp:
@@ -112,7 +118,13 @@ def main():
 
             else:
                 print("map",fp)
+                HELPERS["docd_js_map"] = fp.name
                 fp.rename(SUPPORT_STATIC_DIR/fp.name)
+
+        # Write out the helper
+        HELPER_PATH = SUPPORT_DIR/"web_context.json"
+        with HELPER_PATH.open("w") as f:
+            f.write(json.dumps(HELPERS,indent=4))
 
         return
 
