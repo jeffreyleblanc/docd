@@ -29,8 +29,3 @@ uninstall:
 setup-web:
 	cd spa-src && make setup
 
-build-web:
-	cd spa-src && make build
-
-clean-web:
-	cd spa-src && make clean

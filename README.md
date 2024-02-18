@@ -9,16 +9,28 @@ It's designed to roughly mimic `mkdocs`, but have more flexbility.
 
 ## Setup and Installation TLDR
 
-On a Debian/Ubuntu System
+On a Debian/Ubuntu System:
 
 ```sh
 # Install dependencies
-sudo apt-get install make rsync python3-mistune python3-pygments python3-toml nodejs npm ripgrep
-# Setup
-make setup-web
-make build-web
+sudo apt-get install make rsync python3-mistune python3-pygments python3-toml ripgrep
+# Install
 make install 
 ```
+
+To full build from source:
+
+```sh
+# Install dependencies
+sudo apt-get install make rsync python3-mistune python3-pygments python3-tomlripgrep
+sudo apt-get install nodejs npm 
+# Setup and build web
+make setup-web
+./docd-local.py build-web
+# Install
+make install 
+```
+
 
 ## Setup and Installation Details
 
@@ -40,8 +52,6 @@ The main Makefile can call the other, so these are the commands:
 install          Install the tools and libraries
 uninstall        Uninstall the tools and libraries
 setup-web        Setup node/npm tooling
-build-web        Build the css and js source into support
-clean-web        Clean all built css and js from support
 ```
 
 `make install` populates:
@@ -137,8 +147,8 @@ options:
 ## Development Patterns
 
 ```sh
-# Build the spa
-$ make build-web
+# Build the spa js/css
+$ ./docd-local.py build-web
 
 # Rebuild the spa or the entire site running from repo
 $ ./docd.py -R PATH_TO_DOCS_REPO spa
