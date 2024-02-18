@@ -81,12 +81,19 @@ class Publisher:
             print(c,o,e)
             raise Exception("Rsync of static failed")
 
+        # Load the static info json
+        STATIC_INFO_FILE = self.SUPPORT_RESOURCES_DIRPATH/"static-info.json"
+        with STATIC_INFO_FILE.open("r") as f:
+            static_info = json.loads(f.read())
+
         # Make the spa page with embedded page database
         html = self.SPA_TEMPLATE.render(
             title=self.site_config.title,
             name=self.site_config.name,
             footer=self.site_config.footer,
             home_addr=self.site_config.home_addr,
+            css_file = static_info["docd_css_file"],
+            js_file = static_info["docd_js_file"],
             rh=uuid.uuid4().hex[:6]
         )
         with Path(self.DEST_ROOT/"index.html").open("w") as f:

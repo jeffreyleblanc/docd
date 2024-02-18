@@ -69,7 +69,7 @@ def build_web(add_timestamp=False):
             # Make a new name for the file
             sha256 = file_sha256(fp)
             CSS_NAME = f"docd-core-{sha256[:8]}.css"
-            INSTALLED_FILES["docd_css_file"] = CSS_NAME
+            INSTALLED_FILES["docd_css_file"] = f"static/{CSS_NAME}"
 
             # Move the file and append timestamp
             moved_file = SUPPORT_STATIC_DIR/CSS_NAME
@@ -82,7 +82,7 @@ def build_web(add_timestamp=False):
             # Make a new name for the file
             sha256 = file_sha256(fp)
             JS_NAME = f"docd-core-{sha256[:8]}.js"
-            INSTALLED_FILES["docd_js_file"] = JS_NAME
+            INSTALLED_FILES["docd_js_file"] = f"static/{JS_NAME}"
 
             # Move the file and append timestamp
             moved_file = SUPPORT_STATIC_DIR/JS_NAME
@@ -92,7 +92,7 @@ def build_web(add_timestamp=False):
                     fp.write(stamp)
 
         elif fsuffix == ".js.map":
-            INSTALLED_FILES["docd_js_map"] = fp.name
+            INSTALLED_FILES["docd_js_map"] = f"static/{fp.name}"
             fp.rename(SUPPORT_STATIC_DIR/fp.name)
 
         else:

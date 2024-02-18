@@ -1,6 +1,6 @@
 {
-    "docd_css_file": "docd-core-dd226cd3.css",
-    "docd_js_map": "index-68dda6a0.js.map",
-    "docd_js_file": "docd-core-27157e54.js",
-    "built": "2024-02-18T20:54:34.907806+00:00"
+    "docd_css_file": "static/docd-core-dd226cd3.css",
+    "docd_js_map": "static/index-68dda6a0.js.map",
+    "docd_js_file": "static/docd-core-27157e54.js",
+    "built": "2024-02-18T21:04:34.419261+00:00"
 }
