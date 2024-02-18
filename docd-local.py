@@ -66,6 +66,8 @@ def main():
 
     if args.main_command == "build-web":
 
+        # In future we could get the md5sum within python
+
         # Determine paths
         HERE = Path(__file__).parent
         SPA_SRC_DIR = HERE/"spa-src"
@@ -81,76 +83,63 @@ def main():
             else:
                 fp.unlink()
 
+        # Build the source
         c,o,e = proc("make build",cwd=SPA_SRC_DIR)
         print(c,o,e)
+        assert c == 0
 
+        # Make datestamp and storage for the file names
         dt = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
         stamp = f"/* built: {dt} */"
+        FINAL_FILES = {}
 
-        HELPERS = {}
-
-        # In future we could get the md5sum within python
+        # Iterate over the built files
         for fp in DIST_SRC_DIR.iterdir():
-            ## print("=>",fp)
-            if fp.stem.startswith("index") and fp.suffix == ".css":
-                print("css: ",fp)
+            # Get the stem and suffix
+            fstem = fp.stem
+            fsuffix = "".join(fp.suffixes)
+
+            if fstem.startswith("index") and fsuffix == ".css":
+                # Get the md5sum
                 c,o,e = proc(f"md5sum {fp}")
-                print("~~>",o[:12])
+                assert c == 0
+
+                # Make a new name for the file
                 CSS_NAME = f"docd-core-{o[:12]}.css"
-                HELPERS["docd_css_file"] = CSS_NAME
+                FINAL_FILES["docd_css_file"] = CSS_NAME
+
+                # Move the file and append timestamp
                 moved_file = SUPPORT_STATIC_DIR/CSS_NAME
                 fp.rename(moved_file)
-
                 with moved_file.open("a") as fp:
                     fp.write(stamp)
 
-            elif fp.stem.startswith("index") and fp.suffix == ".js":
-                print("js: ",fp)
+            elif fstem.startswith("index") and fsuffix == ".js":
+                # Get the md5sum
                 c,o,e = proc(f"md5sum {fp}")
-                print("~~>",o[:12])
+                assert c == 0
+
+                # Make a new name for the file
                 JS_NAME = f"docd-core-{o[:12]}.js"
-                HELPERS["docd_js_file"] = JS_NAME
+                FINAL_FILES["docd_js_file"] = JS_NAME
+
+                # Move the file and append timestamp
                 moved_file = SUPPORT_STATIC_DIR/JS_NAME
                 fp.rename(moved_file)
-
                 with moved_file.open("a") as fp:
                     fp.write(stamp)
 
-            else:
-                print("map",fp)
-                HELPERS["docd_js_map"] = fp.name
+            elif fsuffix == ".js.map":
+                FINAL_FILES["docd_js_map"] = fp.name
                 fp.rename(SUPPORT_STATIC_DIR/fp.name)
 
+            else:
+                raise Exception("UNKNOWN FILE!",fp)
+
         # Write out the helper
-        HELPER_PATH = SUPPORT_DIR/"web_context.json"
+        HELPER_PATH = SUPPORT_DIR/"static-info.json"
         with HELPER_PATH.open("w") as f:
-            f.write(json.dumps(HELPERS,indent=4))
-
-        return
-
-        # Make and clean the _dist directory
-        self.DIST_PATH.mkdir(exist_ok=True,parents=True)
-        glob_delete(self.DIST_PATH,"dist.compiled*")
-
-        # Build the src
-        c,o,e = proc("make build-web",cwd=self.SRC_PATH)
-        print(c,o,e)
-
-        exit()
-
-        # Calculate hash and move compiled js into _dist
-        c,o,e = proc("md5sum src/dist.compiled.js")
-        fhash = o[:8]
-        new_path = self.DIST_PATH/f"dist.compiled.{fhash}.js"
-        Path("src/dist.compiled.js").replace(new_path)
-
-        # Append the build time to the js dist
-        dt = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
-        stamp = f"/* built: {dt} */"
-        with new_path.open("a") as fp:
-            fp.write(stamp)
-
-        exit()
+            f.write(json.dumps(FINAL_FILES,indent=4))
 
 
 if __name__ == "__main__":
