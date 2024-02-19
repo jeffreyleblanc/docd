@@ -101,6 +101,7 @@ max_depth = 3 # default is 2. this is max directory depth that is parsed
 name = "Joe's Docs"
 title= "Joe's Code Documentation"
 footer = "Copyright Joe. All Rights Reserved."
+author = "Joe Smith"
 # optional:
 home_addr = "https://joes-page.com"
 

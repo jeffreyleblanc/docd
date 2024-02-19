@@ -90,6 +90,7 @@ class Publisher:
         html = self.SPA_TEMPLATE.render(
             title=self.site_config.title,
             name=self.site_config.name,
+            author=self.site_config.author,
             footer=self.site_config.footer,
             home_addr=self.site_config.home_addr,
             css_file = static_info["docd_css_file"],

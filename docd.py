@@ -50,7 +50,7 @@ def load_config(config_fpath):
         }
 
     # Make sure we have the 'site' attributes
-    for k in ( "site.title","site.name","site.footer" ):
+    for k in ( "site.title","site.author","site.name","site.footer" ):
         if config.get_path(k) is None:
             raise Exception(f"docd.toml missing `{k}`")
     if "home_addr" not in config.site:
@@ -74,7 +74,7 @@ def load_config(config_fpath):
 
 
 if __name__ == "__main__":
-    __VERSION__ = "0.0.3"
+    __VERSION__ = "0.0.4"
 
     #-- Make the argparser -----------------------------------------------------------#
 
