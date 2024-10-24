@@ -8,7 +8,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import html
 
 class HighlightRenderer(mistune.HTMLRenderer):
-    def block_code(self, code, lang=None):
+    def block_code(self, code, lang=None, info=None):
         if lang is not None:
             lang = lang.strip()
         if lang:
@@ -23,6 +23,11 @@ class HighlightRenderer(mistune.HTMLRenderer):
 MARKDOWN = mistune.create_markdown(renderer=HighlightRenderer())
 
 def make_html(text):
-    html = MARKDOWN(text)
-    return html
+    try:
+        html = MARKDOWN(text)
+        return html
+    except TypeError as e:
+        print("ISSSUE!!!")
+        print(text)
+        raise e
 
