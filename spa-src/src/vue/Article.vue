@@ -10,7 +10,7 @@ SPDX-License-Indentifier: MIT
         <div v-if="error_open" class="py-2 px-4 bg-red-700 text-white">
             {{error_msg}}
         </div>
-        <section ref="article_container" class="ui-child-expand ui-parent-col overflow-y-scroll">
+        <section ref="article_container" class="ui-child-expand ui-parent-col ui-scroll-y">
             <article class="grow px-4 pt-8 pb-16 md:w-[42rem] md:self-center md:px-0 md:pt-12 md:pb-24 docd-article" v-html="current_html" />
             <ArticleFooter/>
         </section>

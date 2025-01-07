@@ -49,7 +49,7 @@ SPDX-License-Indentifier: MIT
         </section>
     </header>
 
-    <section class="ui-child-expand ui-parent-col gap-y-1 px-4 py-8 overflow-y-scroll">
+    <section class="ui-child-expand ui-parent-col ui-scroll-y gap-y-1 px-4 py-8">
         <NavigationPanelCategory
             v-if="root_node!=null"
             :deep="false"

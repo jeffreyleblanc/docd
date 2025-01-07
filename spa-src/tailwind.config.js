@@ -6,7 +6,7 @@ export default {
         './src/**/*.{vue,js,ts,jsx,tsx}',
     ],
     safelist: [
-        'highlighted-syntax'
+        'codehilite'
     ],
     darkMode: 'class',
     theme: {

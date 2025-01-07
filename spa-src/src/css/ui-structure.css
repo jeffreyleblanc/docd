@@ -85,4 +85,11 @@ SPDX-License-Indentifier: MIT
         transform: translate(-50%,-50%);
     }
 
+    .ui-scroll-y {
+        @apply
+            overflow-y-scroll
+            dark:[color-scheme:dark]
+        ;
+    }
+
 }

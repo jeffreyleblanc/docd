@@ -143,7 +143,7 @@ SPDX-License-Indentifier: MIT
         overflow-wrap: break-word;
         */
 
-        .docd-article > pre {
+        .docd-article > div.codehilite {
             @apply
                 py-4
                 px-6
@@ -152,21 +152,36 @@ SPDX-License-Indentifier: MIT
                 th-core-bg-surface1
             ;
         }
+
+        /* OLD: */
+
+        /*
+        .docd-article > pre {
+            @apply
+                py-4
+                px-6
+                rounded
+                overflow-x-auto
+                th-core-bg-surface1
+            ;
+        }
         .docd-article > pre code {
             @apply
-                text-sm /* I haven't figured out why we need this */
+                text-sm
                 leading-5
             ;
         }
+        */
 
+        /*
         .highlighted-syntax {
             @apply
-                text-sm /* I haven't figured out why we need this */
+                text-sm
                 py-4
                 px-6
                 rounded
                 border-none
-                overflow-x-auto /* Adds scrollbar only if needed */
+                overflow-x-auto
                 th-core-bg-surface1
                 th-core-text-base
             ;
@@ -176,6 +191,7 @@ SPDX-License-Indentifier: MIT
                 leading-5
             ;
         }
+        */
 
     /*-- Images ---------------------------------------*/
 
