@@ -14,24 +14,28 @@ SPDX-License-Indentifier: MIT
             </button>
         </nav>
         <div
-            v-for="category in side_entries"
+            v-for="category in tmp_entries"
             ref="category_entries"
-            :key="category.name"
+            :key="category.display_name"
             class="flex flex-col gap-y-4 p-4 rounded th-core-bg-surface1"
         >
             <div class="font-bold text-xl">
-                {{category.name}}
+                {{category.display_name}}
             </div>
             <div class="columns-2xs gap-y-1">
-                <div v-for="page in category.pages" :key="page.name"
+                <div v-for="page in category.files" :key="page.display_name"
                      class="w-fit cursor-pointer th-core-text-base hover:th-accent-text"
                     @click="load_page(page.uri)"
                 >
-                    {{page.name}}
+                    {{page.display_name}}
                 </div>
             </div>
         </div>
     </div>
+    <!--
+    <div>DATA DUMP:</div>
+    <pre v-html="JSON.stringify(root_node,null,'    ')"/>
+    -->
 </section>
 </template>
 
@@ -43,6 +47,8 @@ export default {
     components: { IconLargeX },
     computed: {
         side_entries(){ return this.$M.data.side_entries; },
+        root_node(){ return this.$M.data.root_node; },
+        tmp_entries(){ return this.$M.data.root_node.directories; },
         map_open: {
             get(){ return this.$M.uistate.map_open; },
             set(val){ this.$M.uistate.map_open = val; }

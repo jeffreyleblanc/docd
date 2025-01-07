@@ -14,7 +14,7 @@ export default {
             // See https://tailwindcss.com/docs/customizing-colors
             colors: {
                 core: colors.zinc,
-                dkaccent: colors.purple,
+                dkaccent: colors.blue,
                 ltaccent: colors.sky
             }
         },
