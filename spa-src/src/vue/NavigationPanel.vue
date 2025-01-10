@@ -3,7 +3,7 @@
 SPDX-FileCopyRightText: Copyright (c) 2023-present Jeffrey LeBlanc
 SPDX-License-Indentifier: MIT
 -->
-<nav class="border-r th-core-border-base">  <!-- Logic and Classes applied in the parent -->
+<nav class="border-r th-core-border-base th-core-bg-surface1">  <!-- Logic and Classes applied in the parent -->
     <header class="p-4 flex flex-col gap-y-4 border-b th-core-border-base">
         <section class="ui-parent-row items-center gap-x-4 th-core-text-pop">
             <h1 class="text-xl font-bold">{{name}}</h1>
@@ -34,10 +34,12 @@ SPDX-License-Indentifier: MIT
                 <IconLargeX/>
             </button>
         </section>
+        <!--
         <section class="ui-parent-row items-start gap-x-2 text-sm">
             <IconGeoAltFill class="basis-4 grow-0 shrink-0 sq-4 mt-0.5 th-core-text-muted"/>
             <span class="th-core-text-base">{{current_uri}}</span>
         </section>
+        -->
         <section class="text-sm flex flex-row items-center gap-x-2 th-core-text-base">
             <IconTextRight class="sq-5 th-core-text-muted"/>
             <button class="w-fit p-1 rounded th-core-bg-surface2 th-accent-text" @click="close_all" title="open all categories">
@@ -49,7 +51,7 @@ SPDX-License-Indentifier: MIT
         </section>
     </header>
 
-    <section class="ui-child-expand ui-parent-col ui-scroll-y gap-y-1 px-4 py-8">
+    <section class="ui-child-expand ui-parent-col ui-scroll-y gap-y-2 px-4 py-8">
         <NavigationPanelCategory
             v-if="root_node!=null"
             :deep="false"

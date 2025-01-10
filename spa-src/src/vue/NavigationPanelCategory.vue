@@ -27,7 +27,7 @@ SPDX-License-Indentifier: MIT
             :key="page.display_name"
         >
             <span class="cursor-pointer"
-                  :class="(page.uri==current_uri)?'th-accent-text font-medium':'th-core-text-muted'"
+                  :class="(page.uri==current_uri)?'th-accent-text font-medium':'th-core-text-soft'"
                   @click="load_page(page)"
             >
                 {{page.display_name}}

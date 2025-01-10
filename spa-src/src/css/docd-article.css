@@ -149,7 +149,7 @@ SPDX-License-Indentifier: MIT
                 px-6
                 rounded
                 overflow-x-auto /* Adds scrollbar only if needed */
-                th-core-bg-surface1
+                th-core-bg-surface2
             ;
         }
 

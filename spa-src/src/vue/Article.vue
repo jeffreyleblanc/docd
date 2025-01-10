@@ -11,7 +11,7 @@ SPDX-License-Indentifier: MIT
             {{error_msg}}
         </div>
         <section ref="article_container" class="ui-child-expand ui-parent-col ui-scroll-y">
-            <article class="grow px-4 pt-8 pb-16 md:w-[42rem] md:self-center md:px-0 md:pt-12 md:pb-24 docd-article" v-html="current_html" />
+            <article class="grow px-4 pt-8 pb-16 md:w-[48rem] md:self-center md:pt-12 md:pb-24 th-core-bg-surface1 docd-article" v-html="current_html" />
             <ArticleFooter/>
         </section>
     </div>

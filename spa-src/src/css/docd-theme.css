@@ -15,13 +15,14 @@ SPDX-License-Indentifier: MIT
 
         /* Main Color */
 
-        .th-core-bg-base      { @apply bg-white       dark:bg-core-900; }
-        .th-core-bg-surface1  { @apply bg-core-100    dark:bg-core-800; }
+        .th-core-bg-base      { @apply bg-white       dark:bg-core-950; }
+        .th-core-bg-surface1  { @apply bg-core-100    dark:bg-core-900; }
         .th-core-bg-surface2  { @apply bg-core-300    dark:bg-core-800; }
         .th-core-bg-muted     { @apply bg-core-500    dark:bg-core-600; }
 
         .th-core-text-pop     { @apply text-core-950  dark:text-core-50; }
         .th-core-text-base    { @apply text-core-800  dark:text-core-300; }
+        .th-core-text-soft    { @apply text-core-800  dark:text-core-400; }
         .th-core-text-muted   { @apply text-core-500  dark:text-core-600; }
 
         .th-core-border-base  { @apply border-core-300 dark:border-core-800; }
