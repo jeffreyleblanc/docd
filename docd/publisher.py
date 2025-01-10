@@ -6,6 +6,8 @@ from pathlib import Path
 import json
 import uuid
 from dataclasses import dataclass
+# Lunr
+from lunr import lunr
 # Local
 from docd.utils.markdown2html import make_html
 from docd.utils.proc import rsync
@@ -71,14 +73,15 @@ class Publisher:
         self.DEST_PAGES_HTML_DIR = self.DEST_RESOURCES_DIR/"pages-html"
         self.DEST_MEDIA_DIR = self.DEST_RESOURCES_DIR/"media"
         self.DEST_SEARCH_DIR = self.DEST_RESOURCES_DIR/"search"
+        self.DEST_SEARCH_INDEX_FILE = self.DEST_SEARCH_DIR/"serialized-index.json"
         self.DEST_STATIC_DIR = self.DEST_RESOURCES_DIR/"static"
 
         # Depth and Holder for nodes
         self.doc_nodes = []
 
-    #-- Build --------------------------------------------------------#
+    #-- Build Structure--------------------------------------------------------#
 
-    def _build_dest_directory_structure(self):
+    def build_dest_directory_structure(self):
         # Make our output root
         self.DEST_ROOT.mkdir(exist_ok=True)
 
@@ -89,9 +92,9 @@ class Publisher:
         self.DEST_SEARCH_DIR.mkdir(exist_ok=True)
         self.DEST_STATIC_DIR.mkdir(exist_ok=True)
 
-    def build_docs(self):
-        self._build_dest_directory_structure()
+    #-- Build Pages --------------------------------------------------------#
 
+    def build_docs(self):
         # Synchronize the media folder
         media_src = self.SOURCE_ROOT/"_media"
         if media_src.is_dir():
@@ -213,4 +216,31 @@ class Publisher:
             txt = f"```{language}\n{code}\n```"
             return make_html(txt)
 
+    #-- Search System ---------------------------------------------------------------------------#
 
+    def build_search_index(self):
+        DOCS = self._create_document_set_for_lunr()
+
+        # Generate the indexer
+        indexer = lunr(ref="path",fields=("title","body"),documents=DOCS)
+
+        # Output the serialized index
+        serialized_index = indexer.serialize()
+        with self.DEST_SEARCH_INDEX_FILE.open("w") as fp:
+            json.dump(serialized_index,fp,indent=None)
+
+
+    def _create_document_set_for_lunr(self):
+        DOCS = []
+        for fpath in sorted(self.SOURCE_ROOT.glob("**/*.md")):
+            ref = fpath.relative_to(self.SOURCE_ROOT)
+            entry = {
+                "path": ref,
+                "title": ref,
+                "body": ""
+            }
+            with fpath.open("r") as fp:
+                entry["body"] = fp.read()
+            DOCS.append(entry)
+
+        return DOCS

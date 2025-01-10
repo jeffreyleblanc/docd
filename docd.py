@@ -94,6 +94,9 @@ if __name__ == "__main__":
     subp_clean = subparsers.add_parser("clean", help="Clean out the docd site")
 
     # Push
+    subp_search = subparsers.add_parser("search", help="Build the search index")
+
+    # Push
     subp_push = subparsers.add_parser("push", help="Push docs to a remote")
 
     # Check
@@ -166,7 +169,18 @@ if __name__ == "__main__":
         case "build":
             from docd.publisher import Publisher
             pub = Publisher(ctx,config)
+            pub.build_dest_directory_structure()
             pub.build_docs()
+            # if args.main_command in ("build","spa"):
+            #     pub.build_spa()
+            # if args.main_command in ("build","publish"):
+            #     pub.build_docs()
+
+        case "search":
+            from docd.publisher import Publisher
+            pub = Publisher(ctx,config)
+            pub.build_dest_directory_structure()
+            pub.build_search_index()
             # if args.main_command in ("build","spa"):
             #     pub.build_spa()
             # if args.main_command in ("build","publish"):
