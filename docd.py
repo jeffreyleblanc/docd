@@ -85,28 +85,19 @@ if __name__ == "__main__":
 
     # Create subparsers
     subparsers = parser.add_subparsers(help="sub-command help",dest="main_command")
+    A = subparsers.add_parser
 
-    # builders
-    subp_build = subparsers.add_parser("build", help="Build the complete docd site")
-    subp_spa = subparsers.add_parser("spa", help="Make the docd spa scaffold")
-    subp_publish = subparsers.add_parser("publish", help="Convert the source docs to html")
-    subp_publish.add_argument("-f","--filepath",default=None)
-    subp_clean = subparsers.add_parser("clean", help="Clean out the docd site")
+    # Main commands
+    A("clean-dist", help="Clean out the docd site")
+    A("build-pages", help="Build the rendered pages")
+    A("build-search", help="Build the search index")
+    A("devserver", help="Run the new server")
 
-    # Push
-    subp_search = subparsers.add_parser("search", help="Build the search index")
+    # Older
+    A("push", help="Push docs to a remote")
+    A("check", help="Check docs for filter phrases")
+    A("info", help="Print info on the repo config")
 
-    # Push
-    subp_push = subparsers.add_parser("push", help="Push docs to a remote")
-
-    # Check
-    subp_check = subparsers.add_parser("check", help="Check docs for filter phrases")
-
-    # Helper Methods
-    subp_info = subparsers.add_parser("info", help="Print info on the repo config")
-
-    # Helper Methods
-    subp_devserver = subparsers.add_parser("devserver", help="Run the new server")
 
     #-- Process args -----------------------------------------------------------#
 
@@ -148,6 +139,72 @@ if __name__ == "__main__":
     #-- Execute the Commands -----------------------------------------------------------#
 
     match args.main_command:
+
+        case "clean-dist":
+            import shutil
+            assert ctx.DOCS_DIST_DIRPATH.is_dir()
+            for fp in ctx.DOCS_DIST_DIRPATH.iterdir():
+                if fp.is_dir():
+                    shutil.rmtree(fp)
+                else:
+                    fp.unlink()
+
+        case "build-pages":
+            from docd.publisher import Publisher
+            pub = Publisher(ctx,config)
+            pub.build_dest_directory_structure()
+            pub.build_docs()
+
+        case "build-search":
+            from docd.publisher import Publisher
+            pub = Publisher(ctx,config)
+            pub.build_dest_directory_structure()
+            pub.build_search_index()
+
+        case "devserver":
+            import asyncio
+            from docd.devserver import DocdDevServer
+
+            # Load the new spa page template
+            SPA_TEMPLATE_PATH = Path("support/templates/spa.html")
+            with SPA_TEMPLATE_PATH.open("r") as fp:
+                SPA_TEMPLATE = fp.read()
+
+            # Make a temporary config for now
+            # Leave off the css and js as those will be dynamically added
+            SPA_CONFIG = {
+                "__TITLE__":    "Temp TITLE",
+                "__AUTHOR__":   "Alice and Bob",
+                "__NAME__" :    "Sample Docs",
+                "__FOOTER__":   "Copyright Me",
+                "__HOME_URL__": "/",
+                # "__CSS_FILE__": "/static/main.css",
+                # "__JS_FILE__":  "/static/main.js"
+            }
+            for k,v in SPA_CONFIG.items():
+                SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
+
+            # Set the static directory as where vite builds to
+            STATIC_DIR = Path("spa-src/dist/static")
+
+            # Set the file paths
+            FILE_PATHS = dict(
+                _resources =     ctx.DOCS_DIST_DIRPATH/"_resources",
+                static = STATIC_DIR
+            )
+
+            async def run_server():
+                PORT = 8100
+                ADDRESS = "localhost"
+                server = DocdDevServer(SPA_TEMPLATE,FILE_PATHS)
+                server.listen(PORT,address=ADDRESS)
+                print(f"Running at {ADDRESS}:{PORT}")
+                await asyncio.Event().wait()
+
+            asyncio.run(run_server())
+
+        ## Older #################################################
+
         case "info":
             import pprint
             pp = pprint.PrettyPrinter(indent=4)
@@ -157,43 +214,6 @@ if __name__ == "__main__":
             pp.pprint(ctx)
             print("\n# config:")
             print(json.dumps(config.to_dict(),indent=4))
-
-        # case ("build"|"spa"|"publish"):
-        #     from docd.publisher import Publisher
-        #     pub = Publisher(ctx,config)
-        #     if args.main_command in ("build","spa"):
-        #         pub.build_spa()
-        #     if args.main_command in ("build","publish"):
-        #         pub.build_docs()
-
-        case "build":
-            from docd.publisher import Publisher
-            pub = Publisher(ctx,config)
-            pub.build_dest_directory_structure()
-            pub.build_docs()
-            # if args.main_command in ("build","spa"):
-            #     pub.build_spa()
-            # if args.main_command in ("build","publish"):
-            #     pub.build_docs()
-
-        case "search":
-            from docd.publisher import Publisher
-            pub = Publisher(ctx,config)
-            pub.build_dest_directory_structure()
-            pub.build_search_index()
-            # if args.main_command in ("build","spa"):
-            #     pub.build_spa()
-            # if args.main_command in ("build","publish"):
-            #     pub.build_docs()
-
-        case "clean":
-            import shutil
-            assert ctx.DOCS_DIST_DIRPATH.is_dir()
-            for fp in ctx.DOCS_DIST_DIRPATH.iterdir():
-                if fp.is_dir():
-                    shutil.rmtree(fp)
-                else:
-                    fp.unlink()
 
         case "check":
             import docd.cmd_check as CHECK
@@ -224,52 +244,6 @@ if __name__ == "__main__":
             cmd = f"rsync -avz --delete {src} {user}@{addr}:{dst}"
             c,o,e = proc(cmd)
             print(c,o,e)
-
-        case "devserver":
-
-            import asyncio
-            from docd.devserver import DocdDevServer
-
-            # Load the new spa page template
-            SPA_TEMPLATE_PATH = Path("support/templates/spa.html")
-            with SPA_TEMPLATE_PATH.open("r") as fp:
-                SPA_TEMPLATE = fp.read()
-
-            # Make a temporary config for now
-            # Leave off the css and js as those will be dynamically added
-            SPA_CONFIG = {
-                "__TITLE__":    "Temp TITLE",
-                "__AUTHOR__":   "Alice and Bob",
-                "__NAME__" :    "Sample Docs",
-                "__FOOTER__":   "Copyright Me",
-                "__HOME_URL__": "/",
-                # "__CSS_FILE__": "/static/main.css",
-                # "__JS_FILE__":  "/static/main.js"
-            }
-            for k,v in SPA_CONFIG.items():
-                SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
-
-            # Set the static directory as where vite builds to
-            STATIC_DIR = Path("spa-src/dist/static")
-
-            # Set the file paths
-            FILE_PATHS = dict(
-                _resources =     ctx.DOCS_DIST_DIRPATH/"_resources",
-                # media =  ctx.DOCS_DIST_DIRPATH/"_media/",
-                # search = ctx.DOCS_DIST_DIRPATH/"_search/",
-                # static = ctx.DOCS_DIST_DIRPATH/"static/"
-                static = STATIC_DIR
-            )
-
-            async def run_server():
-                PORT = 8100
-                ADDRESS = "localhost"
-                server = DocdDevServer(SPA_TEMPLATE,FILE_PATHS)
-                server.listen(PORT,address=ADDRESS)
-                print(f"Running at {ADDRESS}:{PORT}")
-                await asyncio.Event().wait()
-
-            asyncio.run(run_server())
 
         case _:
             print("ERROR: Failed to find command `{args.main_command}`")
