@@ -11,6 +11,21 @@ $ npx vite build --watch
 $ ./docd.py -R PATH_TO_DOCS_REPO newserver
 ```
 
+```sh
+_dist/
+    index.html # spa
+    _resources
+        pages-database.json
+        pages-html/
+            ... all the pages
+        media/
+            ... media support
+        search/
+            ... search tooling
+        static/
+            ... static tooling
+```
+
 
 ## About and Motivation
 

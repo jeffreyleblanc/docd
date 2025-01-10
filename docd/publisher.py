@@ -38,22 +38,6 @@ class DocNode:
             "display_suffix": self.display_suffix
         }
 
-"""
-_dist/
-    index.html # spa
-    _resources
-        pages-database.json
-        pages-html/
-            ... all the pages
-        media/
-            ... media support
-        search/
-            ... search tooling
-        static/
-            ... static tooling
-
-"""
-
 class Publisher:
 
     def __init__(self, ctx, config):
@@ -95,6 +79,9 @@ class Publisher:
     #-- Build Pages --------------------------------------------------------#
 
     def build_docs(self):
+        # Build our doc nodes
+        self._build_set_of_doc_nodes()
+
         # Synchronize the media folder
         media_src = self.SOURCE_ROOT/"_media"
         if media_src.is_dir():
@@ -102,10 +89,6 @@ class Publisher:
             if c != 0:
                 print(c,o,e)
                 raise Exception("Rsync of _media failed")
-
-        # Parse the docs directory
-        self.doc_nodes = []
-        root_node = self._unpack_source_directory(self.SOURCE_ROOT,max_depth=self.max_directory_depth)
 
         # Write out the page database to a json file
         with self.DEST_PAGES_DB_FILE.open("w") as f:
@@ -133,9 +116,56 @@ class Publisher:
                 f.write(content)
 
 
+    def _create_html_page(self, source_path, language):
+        if language == "markdown":
+            return make_html(source_path.read_text())
+        else:
+            code = source_path.read_text()
+            txt = f"```{language}\n{code}\n```"
+            return make_html(txt)
+
+
+    #-- Search System ---------------------------------------------------------------------------#
+
+    def build_search_index(self):
+        self._build_set_of_doc_nodes()
+        DOCS = self._create_document_set_for_lunr()
+
+        # Generate the indexer
+        indexer = lunr(ref="path",fields=("title","body"),documents=DOCS)
+
+        # Output the serialized index
+        serialized_index = indexer.serialize()
+        with self.DEST_SEARCH_INDEX_FILE.open("w") as fp:
+            json.dump(serialized_index,fp,indent=None)
+
+
+    def _create_document_set_for_lunr(self):
+        DOCS = []
+        for docnode in self.doc_nodes:
+            if docnode.kind != "file":
+                continue
+            ref = str(docnode.uri)
+            entry = {
+                "path": ref,
+                "title": ref,
+                "body": ""
+            }
+            with (self.SOURCE_ROOT/docnode.source_path).open("r") as fp:
+                entry["body"] = fp.read()
+            DOCS.append(entry)
+
+        return DOCS
+
+
     #-- Source walker and Page Makers ------------------------------------------------------#
 
-    def _unpack_source_directory(self, directory_path, depth=0, max_depth=100000):
+    def _build_set_of_doc_nodes(self):
+        # Parse the docs directory
+        self.doc_nodes = []
+        self._walk_and_unpack_source_directory(self.SOURCE_ROOT,max_depth=self.max_directory_depth)
+
+    def _walk_and_unpack_source_directory(self, directory_path, depth=0, max_depth=100000):
         # Calculate directory relpath
         directory_relpath = directory_path.relative_to(self.SOURCE_ROOT)
 
@@ -205,42 +235,4 @@ class Publisher:
 
             # If this is a directory, recurse or return depending on depth
             elif child_path.is_dir() and depth+1 <= max_depth:
-                subnode = self._unpack_source_directory(child_path,depth=depth+1,max_depth=max_depth)
-
-
-    def _create_html_page(self, source_path, language):
-        if language == "markdown":
-            return make_html(source_path.read_text())
-        else:
-            code = source_path.read_text()
-            txt = f"```{language}\n{code}\n```"
-            return make_html(txt)
-
-    #-- Search System ---------------------------------------------------------------------------#
-
-    def build_search_index(self):
-        DOCS = self._create_document_set_for_lunr()
-
-        # Generate the indexer
-        indexer = lunr(ref="path",fields=("title","body"),documents=DOCS)
-
-        # Output the serialized index
-        serialized_index = indexer.serialize()
-        with self.DEST_SEARCH_INDEX_FILE.open("w") as fp:
-            json.dump(serialized_index,fp,indent=None)
-
-
-    def _create_document_set_for_lunr(self):
-        DOCS = []
-        for fpath in sorted(self.SOURCE_ROOT.glob("**/*.md")):
-            ref = fpath.relative_to(self.SOURCE_ROOT)
-            entry = {
-                "path": ref,
-                "title": ref,
-                "body": ""
-            }
-            with fpath.open("r") as fp:
-                entry["body"] = fp.read()
-            DOCS.append(entry)
-
-        return DOCS
+                subnode = self._walk_and_unpack_source_directory(child_path,depth=depth+1,max_depth=max_depth)

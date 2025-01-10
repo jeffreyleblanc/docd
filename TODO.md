@@ -1,10 +1,5 @@
 # Todo
 
-* [ ] Unpack what all the current cli do and where things have to live
-
-
-
-
 * [ ] Switch to "modern" global store $G pattern vs the $M pattern
 * [ ] Enable the tornado in dev mode to request a page markdown rebuilt on the fly
     * [ ] basically, if I'm editing the source git file, if I just refresh, get the new one
