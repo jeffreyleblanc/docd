@@ -22,7 +22,7 @@ SPDX-License-Indentifier: MIT
 
         .th-core-text-pop     { @apply text-core-950  dark:text-core-50; }
         .th-core-text-base    { @apply text-core-800  dark:text-core-300; }
-        .th-core-text-soft    { @apply text-core-800  dark:text-core-400; }
+        .th-core-text-soft    { @apply text-core-800  dark:text-core-500; }
         .th-core-text-muted   { @apply text-core-500  dark:text-core-600; }
 
         .th-core-border-base  { @apply border-core-300 dark:border-core-800; }
