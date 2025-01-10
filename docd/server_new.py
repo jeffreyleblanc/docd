@@ -13,38 +13,46 @@ import tornado
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self, path):
-        self.write(f"hello from docd: {path}")
+        # self.write(f"hello from docd: {path}")
         # self.render("index.html")
+        pkg = self.application.fetch_static_paths()
+        html = self.application.SPA_TEMPLATE
+        for k,v in pkg.items():
+            html = html.replace(k,v)
+        self.write(html)
 
 
 class DocdDevServer(tornado.web.Application):
 
-    def __init__(self):
+    def __init__(self, SPA_TEMPLATE, FILE_PATHS):
         self._handlers = []
         self._settings = {}
-        self.initialize()
+        self.initialize(SPA_TEMPLATE, FILE_PATHS)
         super().__init__(self._handlers,**self._settings)
 
-    def initialize(self):
-        # Get our paths
-        self.HERE = Path(__file__).parent
-        static_dir =   self.HERE/"review-server/static"
-        template_dir = self.HERE/"review-server/templates"
+    def fetch_static_paths(self):
+        print("STATIC????")
+        js_raw = [ e for e in self.FILE_PATHS["static"].glob("*.js") ][0]
+        css_raw = [ e for e in self.FILE_PATHS["static"].glob("*.css") ][0]
 
-        PATHS = dict(
-            db = Path.home()/"code/DOCS/_dist/db/",
-            media = Path.home()/"code/DOCS/_dist/_media/",
-            search = Path.home()/"code/DOCS/_dist/_search/",
-            static = Path.home()/"code/DOCS/_dist/static/"
-        )
+        pkg = {
+            "__JS_FILE__": "/static/"+str(js_raw.relative_to(self.FILE_PATHS["static"])),
+            "__CSS_FILE__": "/static/"+str(css_raw.relative_to(self.FILE_PATHS["static"])),
+        }
+        print("pkg:",pkg)
+        return pkg
+
+    def initialize(self, SPA_TEMPLATE, FILE_PATHS):
+        self.SPA_TEMPLATE  = SPA_TEMPLATE
+        self.FILE_PATHS = FILE_PATHS
 
         # Handlers
         self._handlers += [
             # File Handlers
-            (r"^/db/(.*)", tornado.web.StaticFileHandler, {"path": PATHS["db"]}),
-            (r"^/_media/(.*)", tornado.web.StaticFileHandler, {"path": PATHS["media"]}),
-            (r"^/_search/(.*)", tornado.web.StaticFileHandler, {"path": PATHS["search"]}),
-            (r"^/static/(.*)", tornado.web.StaticFileHandler, {"path": PATHS["static"]}),
+            (r"^/db/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["db"]}),
+            (r"^/_media/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["media"]}),
+            (r"^/_search/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["search"]}),
+            (r"^/static/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["static"]}),
             # Catch the rest of it as an SPA
             (r"^/(.*)", MainHandler),
         ]

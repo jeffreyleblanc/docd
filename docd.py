@@ -218,10 +218,44 @@ if __name__ == "__main__":
             import asyncio
             from docd.server_new import DocdDevServer
 
+            # FILE_PATHS = dict(
+            #     db = Path.home()/"code/DOCS/_dist/db/",
+            #     media = Path.home()/"code/DOCS/_dist/_media/",
+            #     search = Path.home()/"code/DOCS/_dist/_search/",
+            #     static = Path.home()/"code/DOCS/_dist/static/"
+            # )
+
+            SPA_TEMPLATE_PATH = Path("support/templates/spa-NEW.html")
+            with SPA_TEMPLATE_PATH.open("r") as fp:
+                SPA_TEMPLATE = fp.read()
+
+            SPA_CONFIG = {
+                "__TITLE__":    "Temp TITLE",
+                "__AUTHOR__":   "Alice and Bob",
+                "__NAME__" :    "Sample Docs",
+                "__FOOTER__":   "Copyright Me",
+                "__HOME_URL__": "/",
+                # "__CSS_FILE__": "/static/main.css",
+                # "__JS_FILE__":  "/static/main.js"
+            }
+            for k,v in SPA_CONFIG.items():
+                SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
+
+            print(SPA_TEMPLATE)
+
+            STATIC_DIR = Path("spa-src/dist/static")
+
+            FILE_PATHS = dict(
+                db =     ctx.DOCS_DIST_DIRPATH/"db",
+                media =  ctx.DOCS_DIST_DIRPATH/"_media/",
+                search = ctx.DOCS_DIST_DIRPATH/"_search/",
+                static = STATIC_DIR ## ctx.DOCS_DIST_DIRPATH/"static/"
+            )
+
             async def run_server():
                 PORT = 8100
                 ADDRESS = "localhost"
-                server = DocdDevServer()
+                server = DocdDevServer(SPA_TEMPLATE,FILE_PATHS)
                 server.listen(PORT,address=ADDRESS)
                 print(f"Running at {ADDRESS}:{PORT}")
                 await asyncio.Event().wait()

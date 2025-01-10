@@ -134,8 +134,10 @@ export default class DataManager {
         }
 
         async _fetch_database(){
-            const resp = await window.fetch(`db/page-db.json?h=${random_string()}`);
+            const resp = await window.fetch(`/db/page-db.json?h=${random_string()}`);
+            console.log("DB resp:",resp);
             const objects = await resp.json();
+            console.log("DB objs:",objects)
             objects.forEach(e=>this._process_node(e));
         }
 
@@ -201,7 +203,7 @@ export default class DataManager {
 
                 // Fetch and set info
                 this._data.current_uri = page_uri;
-                const resp = await window.fetch(`db/${db_uri}?h=${random_string()}`);
+                const resp = await window.fetch(`/db/${db_uri}?h=${random_string()}`);
                 const text = await resp.text();
                 this._data.current_html = text;
             }catch(err){
