@@ -153,46 +153,6 @@ SPDX-License-Indentifier: MIT
             ;
         }
 
-        /* OLD: */
-
-        /*
-        .docd-article > pre {
-            @apply
-                py-4
-                px-6
-                rounded
-                overflow-x-auto
-                th-core-bg-surface1
-            ;
-        }
-        .docd-article > pre code {
-            @apply
-                text-sm
-                leading-5
-            ;
-        }
-        */
-
-        /*
-        .highlighted-syntax {
-            @apply
-                text-sm
-                py-4
-                px-6
-                rounded
-                border-none
-                overflow-x-auto
-                th-core-bg-surface1
-                th-core-text-base
-            ;
-        }
-        .highlighted-syntax pre {
-            @apply
-                leading-5
-            ;
-        }
-        */
-
     /*-- Images ---------------------------------------*/
 
         .docd-article img {
