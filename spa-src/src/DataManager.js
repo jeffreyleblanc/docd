@@ -8,6 +8,13 @@ import {random_string} from "./utils.js"
 export default class DataManager {
 
     constructor(config){
+
+        this.URLS = {
+            db_root: "/db",
+            search_index: "/_search/serialized-index.json"
+        }
+
+
         this._uistate = reactive({
             is_mobile: false,
             show_nav: false,
@@ -36,26 +43,29 @@ export default class DataManager {
 
         this._setup_theme();
 
-        this.load_search_system();
+        this._is_search_index_fetched = false;
     }
 
+    //-- Search System -------------------------------------------------------------------------//
 
-    async load_search_system(){
-        // could make a "search_available" uistate
-        const resp = await window.fetch("/_search/serialized-index.json");
-        console.log("resp:",resp);
-        const resp_obj = await resp.json();
-        console.log("reso_obj",resp_obj)
-        this.search_index = lunr.Index.load(resp_obj);
-    }
+        async load_search_system(){
+            // could make a "search_available" uistate
+            const resp = await window.fetch(this.URLS.search_index);
+            const resp_obj = await resp.json();
+            this.search_index = lunr.Index.load(resp_obj);
+            this._is_search_index_fetched = true;
+        }
 
-    trigger_search(search_text){
-        console.log("run search on:",search_text)
-        const results = this.search_index.search(search_text);
-        console.log("got:",results)
-        this._data.has_search_result = true;
-        this._data.search_results = Object.freeze(results);
-    }
+        async trigger_search(search_text){
+            if(! this._is_search_index_fetched){
+                await this.load_search_system();
+            }
+            console.log("run search on:",search_text)
+            const results = this.search_index.search(search_text);
+            console.log("got:",results)
+            this._data.has_search_result = true;
+            this._data.search_results = Object.freeze(results);
+        }
 
     //-- Vue Hooks and Providers --------------------------------------------//
 
@@ -134,7 +144,7 @@ export default class DataManager {
         }
 
         async _fetch_database(){
-            const resp = await window.fetch(`/db/page-db.json?h=${random_string()}`);
+            const resp = await window.fetch(`${this.URLS.db_root}/page-db.json?h=${random_string()}`);
             console.log("DB resp:",resp);
             const objects = await resp.json();
             console.log("DB objs:",objects)
@@ -203,7 +213,7 @@ export default class DataManager {
 
                 // Fetch and set info
                 this._data.current_uri = page_uri;
-                const resp = await window.fetch(`/db/${db_uri}?h=${random_string()}`);
+                const resp = await window.fetch(`${this.URLS.db_root}/${db_uri}?h=${random_string()}`);
                 const text = await resp.text();
                 this._data.current_html = text;
             }catch(err){

@@ -28,7 +28,7 @@ SPDX-License-Indentifier: MIT
             </button>
         </section>
         <section>
-            <input type="text" v-model="search_term" class="text-black"/>
+            <input type="text" v-model="search_term" class="p-2 text-black"/>
             <button @click="run_search">
                 search
             </button>
