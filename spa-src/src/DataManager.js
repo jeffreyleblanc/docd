@@ -11,7 +11,6 @@ export default class DataManager {
             is_mobile: false,
             show_nav: false,
             theme: "light",
-            map_open: false,
             error_open: false,
             error_msg: ""
         });

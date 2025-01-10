@@ -10,9 +10,8 @@ SPDX-License-Indentifier: MIT
 
 @import 'tailwindcss/utilities';
 @import './ui-structure.css';
+
 @import './docd-theme.css';
 @import './docd-syntax-light.css';
-/* @import './docd-syntax-dark-monokai.css'; */
-@import './docd-syntax-dark-material.css';
+@import './docd-syntax-dark.css';
 @import './docd-article.css';
-

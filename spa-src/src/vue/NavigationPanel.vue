@@ -19,13 +19,6 @@ SPDX-License-Indentifier: MIT
                 <button v-if="!is_darkmode" class="sq-5 cursor-pointer th-accent-text" @click="theme='dark'" title="set theme to dark">
                     <IconMoon/>
                 </button>
-
-                <button v-if="!map_open" class="sq-4 cursor-pointer th-accent-text" @click="map_open=true" title="open site map">
-                    <IconMap/>
-                </button>
-                <button v-if="map_open" class="sq-5 cursor-pointer th-accent-text" @click="map_open=false" title="view article">
-                    <IconTextCenter/>
-                </button>
             </div>
 
             <div class="grow"/>
@@ -34,12 +27,6 @@ SPDX-License-Indentifier: MIT
                 <IconLargeX/>
             </button>
         </section>
-        <!--
-        <section class="ui-parent-row items-start gap-x-2 text-sm">
-            <IconGeoAltFill class="basis-4 grow-0 shrink-0 sq-4 mt-0.5 th-core-text-muted"/>
-            <span class="th-core-text-base">{{current_uri}}</span>
-        </section>
-        -->
         <section class="text-sm flex flex-row items-center gap-x-2 th-core-text-base">
             <IconTextRight class="sq-5 th-core-text-muted"/>
             <button class="w-fit p-1 rounded th-core-bg-surface2 th-accent-text" @click="close_all" title="open all categories">
@@ -89,10 +76,6 @@ export default {
         show_nav: {
             get(){ return this.$M.uistate.show_nav; },
             set(val){ this.$M.uistate.show_nav = val; }
-        },
-        map_open: {
-            get(){ return this.$M.uistate.map_open; },
-            set(val){ this.$M.uistate.map_open = val; }
         },
         root_node(){ return this.$M.data.root_node; },
         theme: {
