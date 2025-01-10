@@ -6,6 +6,7 @@
     * [ ] Keep it simple for now
 * [ ] Make a faster basic watcher vite builder
     * [ ] Make it inject the source properly somewhere
+* [ ] Switch to "modern" global store $G pattern vs the $M pattern
 * [ ] Enable the tornado in dev mode to request a page markdown rebuilt on the fly
     * [ ] basically, if I'm editing the source git file, if I just refresh, get the new one
           without the need to run any cli commands
