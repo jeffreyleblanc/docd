@@ -108,6 +108,9 @@ if __name__ == "__main__":
     # Helper Methods
     subp_info = subparsers.add_parser("info", help="Print info on the repo config")
 
+    # Helper Methods
+    subp_newserver = subparsers.add_parser("newserver", help="Run the new server")
+
     #-- Process args -----------------------------------------------------------#
 
     args = parser.parse_args()
@@ -209,6 +212,21 @@ if __name__ == "__main__":
             cmd = f"rsync -avz --delete {src} {user}@{addr}:{dst}"
             c,o,e = proc(cmd)
             print(c,o,e)
+
+        case "newserver":
+
+            import asyncio
+            from docd.server_new import DocdDevServer
+
+            async def run_server():
+                PORT = 8100
+                ADDRESS = "localhost"
+                server = DocdDevServer()
+                server.listen(PORT,address=ADDRESS)
+                print(f"Running at {ADDRESS}:{PORT}")
+                await asyncio.Event().wait()
+
+            asyncio.run(run_server())
 
         case _:
             print("ERROR: Failed to find command `{args.main_command}`")

@@ -4,7 +4,6 @@
 """
 Simple http file server.
 """
-#! /usr/bin/env python3
 
 from pathlib import Path
 import json
@@ -18,7 +17,7 @@ class MainHandler(tornado.web.RequestHandler):
         # self.render("index.html")
 
 
-class MyApp(tornado.web.Application):
+class DocdDevServer(tornado.web.Application):
 
     def __init__(self):
         self._handlers = []
@@ -55,15 +54,3 @@ class MyApp(tornado.web.Application):
             debug= True,
             autoreload= True
         )
-
-
-async def main():
-    PORT = 8100
-    ADDRESS = "localhost"
-    app = MyApp()
-    app.listen(PORT,address=ADDRESS)
-    print(f"Running at {ADDRESS}:{PORT}")
-    await asyncio.Event().wait()
-
-if __name__ == "__main__":
-    asyncio.run(main())
