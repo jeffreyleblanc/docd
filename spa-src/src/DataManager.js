@@ -2,6 +2,7 @@
 // SPDX-License-Indentifier: MIT
 
 import {reactive} from "vue"
+import lunr from "lunr"
 import {random_string} from "./utils.js"
 
 export default class DataManager {
@@ -27,10 +28,33 @@ export default class DataManager {
             orphaned_nodes: new Set(),
             // Current data
             current_uri: "",
-            current_html: ""
+            current_html: "",
+            // Search data
+            has_search_result: false,
+            search_results: []
         });
 
         this._setup_theme();
+
+        this.load_search_system();
+    }
+
+
+    async load_search_system(){
+        // could make a "search_available" uistate
+        const resp = await window.fetch("/_search/serialized-index.json");
+        console.log("resp:",resp);
+        const resp_obj = await resp.json();
+        console.log("reso_obj",resp_obj)
+        this.search_index = lunr.Index.load(resp_obj);
+    }
+
+    trigger_search(search_text){
+        console.log("run search on:",search_text)
+        const results = this.search_index.search(search_text);
+        console.log("got:",results)
+        this._data.has_search_result = true;
+        this._data.search_results = Object.freeze(results);
     }
 
     //-- Vue Hooks and Providers --------------------------------------------//

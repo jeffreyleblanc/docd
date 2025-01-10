@@ -27,6 +27,17 @@ SPDX-License-Indentifier: MIT
                 <IconLargeX/>
             </button>
         </section>
+        <section>
+            <input type="text" v-model="search_term" class="text-black"/>
+            <button @click="run_search">
+                search
+            </button>
+            <div v-if="has_search_results">
+                <span>RESULTS:</span>
+                <pre v-for="r in search_results" v-html="JSON.stringify(r)"/>
+            </div>
+            <div v-else>No results</div>
+        </section>
         <section class="text-sm flex flex-row items-center gap-x-2 th-core-text-base">
             <IconTextRight class="sq-5 th-core-text-muted"/>
             <button class="w-fit p-1 rounded th-core-bg-surface2 th-accent-text" @click="close_all" title="open all categories">
@@ -63,7 +74,9 @@ import IconTextRight from "./icons/IconTextRight.vue"
 import NavigationPanelCategory from "./NavigationPanelCategory.vue"
 
 export default {
-    data(){ return {} },
+    data(){ return {
+        search_term: ""
+    } },
     components: {
         IconHouse, IconSun, IconMoon, IconMap, IconTextCenter, IconLargeX,
         IconGeoAltFill, IconTextRight,
@@ -84,7 +97,10 @@ export default {
         },
         is_darkmode(){ return this.theme=="dark"; },
         is_mobile(){ return this.$M.uistate.is_mobile; },
-        current_uri(){ return this.$M.data.current_uri; }
+        current_uri(){ return this.$M.data.current_uri; },
+        // search
+        has_search_results(){ return this.$M.data.has_search_result },
+        search_results(){ return this.$M.data.search_results }
     },
     methods: {
         // pass
@@ -93,6 +109,10 @@ export default {
         },
         close_all(){
             this.$M.toggle_all_directories(false);
+        },
+        run_search(){
+            console.log("RUN SEARCH!!",this.search_term)
+            this.$M.trigger_search(this.search_term);
         }
     }
 }
