@@ -1,5 +1,6 @@
 # Todo
 
+* [ ] have search only fetch the search-index on the initial grab
 * [ ] Unpack what all the current cli do and where things have to live
 * [ ] Switch to a tornado based local server system
     * [ ] Keep it simple for now
@@ -20,10 +21,11 @@
 * [ ] vue router
     * [ ] implement it
     * [ ] switch to using non hash addressing
+* [ ] version the search index
 * [ ] enable hosting sites to work with new output using caddy
+* [ ] push as a test
 
-
-PAUSE
+PAUSE + EVAL
 
 * update how the markdown gets generated
     * maybe use our nested system as an option
