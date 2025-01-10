@@ -218,17 +218,13 @@ if __name__ == "__main__":
             import asyncio
             from docd.server_new import DocdDevServer
 
-            # FILE_PATHS = dict(
-            #     db = Path.home()/"code/DOCS/_dist/db/",
-            #     media = Path.home()/"code/DOCS/_dist/_media/",
-            #     search = Path.home()/"code/DOCS/_dist/_search/",
-            #     static = Path.home()/"code/DOCS/_dist/static/"
-            # )
-
+            # Load the new spa page template
             SPA_TEMPLATE_PATH = Path("support/templates/spa-NEW.html")
             with SPA_TEMPLATE_PATH.open("r") as fp:
                 SPA_TEMPLATE = fp.read()
 
+            # Make a temporary config for now
+            # Leave off the css and js as those will be dynamically added
             SPA_CONFIG = {
                 "__TITLE__":    "Temp TITLE",
                 "__AUTHOR__":   "Alice and Bob",
@@ -241,15 +237,16 @@ if __name__ == "__main__":
             for k,v in SPA_CONFIG.items():
                 SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
 
-            print(SPA_TEMPLATE)
-
+            # Set the static directory as where vite builds to
             STATIC_DIR = Path("spa-src/dist/static")
 
+            # Set the file paths
             FILE_PATHS = dict(
                 db =     ctx.DOCS_DIST_DIRPATH/"db",
                 media =  ctx.DOCS_DIST_DIRPATH/"_media/",
                 search = ctx.DOCS_DIST_DIRPATH/"_search/",
-                static = STATIC_DIR ## ctx.DOCS_DIST_DIRPATH/"static/"
+                # static = ctx.DOCS_DIST_DIRPATH/"static/"
+                static = STATIC_DIR
             )
 
             async def run_server():

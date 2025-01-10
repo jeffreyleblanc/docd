@@ -13,8 +13,6 @@ import tornado
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self, path):
-        # self.write(f"hello from docd: {path}")
-        # self.render("index.html")
         pkg = self.application.fetch_static_paths()
         html = self.application.SPA_TEMPLATE
         for k,v in pkg.items():
@@ -29,18 +27,6 @@ class DocdDevServer(tornado.web.Application):
         self._settings = {}
         self.initialize(SPA_TEMPLATE, FILE_PATHS)
         super().__init__(self._handlers,**self._settings)
-
-    def fetch_static_paths(self):
-        print("STATIC????")
-        js_raw = [ e for e in self.FILE_PATHS["static"].glob("*.js") ][0]
-        css_raw = [ e for e in self.FILE_PATHS["static"].glob("*.css") ][0]
-
-        pkg = {
-            "__JS_FILE__": "/static/"+str(js_raw.relative_to(self.FILE_PATHS["static"])),
-            "__CSS_FILE__": "/static/"+str(css_raw.relative_to(self.FILE_PATHS["static"])),
-        }
-        print("pkg:",pkg)
-        return pkg
 
     def initialize(self, SPA_TEMPLATE, FILE_PATHS):
         self.SPA_TEMPLATE  = SPA_TEMPLATE
@@ -62,3 +48,14 @@ class DocdDevServer(tornado.web.Application):
             debug= True,
             autoreload= True
         )
+
+    def fetch_static_paths(self):
+        # Find the paths
+        js_file = [ e for e in self.FILE_PATHS["static"].glob("*.js") ][0]
+        css_file = [ e for e in self.FILE_PATHS["static"].glob("*.css") ][0]
+
+        # Return the paths
+        return {
+            "__JS_FILE__":  f"/static/{js_file.name}",
+            "__CSS_FILE__": f"/static/{css_file.name}",
+        }

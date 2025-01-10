@@ -1,5 +1,17 @@
 # Docd Overview
 
+## Development Usage
+
+```sh
+# In one pane:
+$ cd spa-src
+$ npx vite build --watch
+
+# In another:
+$ ./docd.py -R PATH_TO_DOCS_REPO newserver
+```
+
+
 ## About and Motivation
 
 `docd` is a tool for building documentation from markdown and other source files.
