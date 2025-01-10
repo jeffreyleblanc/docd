@@ -155,13 +155,22 @@ if __name__ == "__main__":
             print("\n# config:")
             print(json.dumps(config.to_dict(),indent=4))
 
-        case ("build"|"spa"|"publish"):
+        # case ("build"|"spa"|"publish"):
+        #     from docd.publisher import Publisher
+        #     pub = Publisher(ctx,config)
+        #     if args.main_command in ("build","spa"):
+        #         pub.build_spa()
+        #     if args.main_command in ("build","publish"):
+        #         pub.build_docs()
+
+        case "build":
             from docd.publisher import Publisher
             pub = Publisher(ctx,config)
-            if args.main_command in ("build","spa"):
-                pub.build_spa()
-            if args.main_command in ("build","publish"):
-                pub.build_docs()
+            pub.build_docs()
+            # if args.main_command in ("build","spa"):
+            #     pub.build_spa()
+            # if args.main_command in ("build","publish"):
+            #     pub.build_docs()
 
         case "clean":
             import shutil
@@ -231,9 +240,9 @@ if __name__ == "__main__":
 
             # Set the file paths
             FILE_PATHS = dict(
-                db =     ctx.DOCS_DIST_DIRPATH/"db",
-                media =  ctx.DOCS_DIST_DIRPATH/"_media/",
-                search = ctx.DOCS_DIST_DIRPATH/"_search/",
+                _resources =     ctx.DOCS_DIST_DIRPATH/"_resources",
+                # media =  ctx.DOCS_DIST_DIRPATH/"_media/",
+                # search = ctx.DOCS_DIST_DIRPATH/"_search/",
                 # static = ctx.DOCS_DIST_DIRPATH/"static/"
                 static = STATIC_DIR
             )

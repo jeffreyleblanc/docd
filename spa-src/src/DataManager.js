@@ -10,8 +10,8 @@ export default class DataManager {
     constructor(config){
 
         this.URLS = {
-            db_root: "/db",
-            search_index: "/_search/serialized-index.json"
+            db_root: "/_resources",
+            search_index: "/_resources/search/serialized-index.json"
         }
 
 
@@ -144,7 +144,7 @@ export default class DataManager {
         }
 
         async _fetch_database(){
-            const resp = await window.fetch(`${this.URLS.db_root}/page-db.json?h=${random_string()}`);
+            const resp = await window.fetch(`${this.URLS.db_root}/pages-database.json?h=${random_string()}`);
             console.log("DB resp:",resp);
             const objects = await resp.json();
             console.log("DB objs:",objects)
@@ -213,7 +213,7 @@ export default class DataManager {
 
                 // Fetch and set info
                 this._data.current_uri = page_uri;
-                const resp = await window.fetch(`${this.URLS.db_root}/${db_uri}?h=${random_string()}`);
+                const resp = await window.fetch(`${this.URLS.db_root}/pages-html/${db_uri}?h=${random_string()}`);
                 const text = await resp.text();
                 this._data.current_html = text;
             }catch(err){

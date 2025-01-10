@@ -35,10 +35,11 @@ class DocdDevServer(tornado.web.Application):
         # Handlers
         self._handlers += [
             # File Handlers
-            (r"^/db/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["db"]}),
-            (r"^/_media/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["media"]}),
-            (r"^/_search/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["search"]}),
-            (r"^/static/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["static"]}),
+            (r"^/_resources/static/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["static"]}),
+            (r"^/_resources/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["_resources"]}),
+            # (r"^/_media/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["media"]}),
+            # (r"^/_search/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["search"]}),
+            # (r"^/static/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["static"]}),
             # Catch the rest of it as an SPA
             (r"^/(.*)", MainHandler),
         ]
@@ -56,6 +57,6 @@ class DocdDevServer(tornado.web.Application):
 
         # Return the paths
         return {
-            "__JS_FILE__":  f"/static/{js_file.name}",
-            "__CSS_FILE__": f"/static/{css_file.name}",
+            "__JS_FILE__":  f"/_resources/static/{js_file.name}",
+            "__CSS_FILE__": f"/_resources/static/{css_file.name}",
         }

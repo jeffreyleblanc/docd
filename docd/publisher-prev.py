@@ -6,9 +6,13 @@ from pathlib import Path
 import json
 import uuid
 from dataclasses import dataclass
+# Libraries
+from mako.template import Template
+from mako.lookup import TemplateLookup
 # Local
 from docd.utils.markdown2html import make_html
 from docd.utils.proc import rsync
+from docd.utils.filetools import clear_directory
 
 
 SKIP_DIRECTORIES = (".git","_output","_media")
@@ -36,22 +40,6 @@ class DocNode:
             "display_suffix": self.display_suffix
         }
 
-"""
-_dist/
-    index.html # spa
-    _resources
-        pages-database.json
-        pages-html/
-            ... all the pages
-        media/
-            ... media support
-        search/
-            ... search tooling
-        static/
-            ... static tooling
-
-"""
-
 class Publisher:
 
     def __init__(self, ctx, config):
@@ -63,49 +51,75 @@ class Publisher:
         # Establish base paths
         self.REPO_ROOT = ctx.DOCS_REPO_DIRPATH
         self.SOURCE_ROOT = ctx.DOCS_DOCS_DIRPATH
-
-        # Destination paths
         self.DEST_ROOT = ctx.DOCS_DIST_DIRPATH
-        self.DEST_RESOURCES_DIR = ctx.DOCS_DIST_DIRPATH/"_resources"
-        self.DEST_PAGES_DB_FILE = self.DEST_RESOURCES_DIR/"pages-database.json"
-        self.DEST_PAGES_HTML_DIR = self.DEST_RESOURCES_DIR/"pages-html"
-        self.DEST_MEDIA_DIR = self.DEST_RESOURCES_DIR/"media"
-        self.DEST_SEARCH_DIR = self.DEST_RESOURCES_DIR/"search"
-        self.DEST_STATIC_DIR = self.DEST_RESOURCES_DIR/"static"
+        self.DEST_ROOT_DB = ctx.DOCS_DIST_DIRPATH/"db"
+
+        # Load the html template
+        self.SUPPORT_RESOURCES_DIRPATH = ctx.SUPPORT_RESOURCES_DIRPATH
+        _template_dir = self.SUPPORT_RESOURCES_DIRPATH/"templates/"
+        _template_lookup = TemplateLookup(directories=[_template_dir])
+        self.SPA_TEMPLATE = _template_lookup.get_template("spa.html")
 
         # Depth and Holder for nodes
         self.doc_nodes = []
 
     #-- Build --------------------------------------------------------#
 
-    def _build_dest_directory_structure(self):
+    def _build_setup(self):
         # Make our output root
         self.DEST_ROOT.mkdir(exist_ok=True)
 
-        # Make all of our subdirectories
-        self.DEST_RESOURCES_DIR.mkdir(exist_ok=True)
-        self.DEST_PAGES_HTML_DIR.mkdir(exist_ok=True)
-        self.DEST_MEDIA_DIR.mkdir(exist_ok=True)
-        self.DEST_SEARCH_DIR.mkdir(exist_ok=True)
-        self.DEST_STATIC_DIR.mkdir(exist_ok=True)
+    def build_spa(self):
+        self._build_setup()
+
+        # Synchronize static directory
+        SRC_STATIC = self.SUPPORT_RESOURCES_DIRPATH/"static"
+        DEST_STATIC = self.DEST_ROOT/"static"
+        DEST_STATIC.mkdir(exist_ok=True)
+        c,o,e = rsync(SRC_STATIC,DEST_STATIC,delete=True,exclude=[".gitkeep"])
+        if c != 0:
+            print(c,o,e)
+            raise Exception("Rsync of static failed")
+
+        # Load the static info json
+        STATIC_INFO_FILE = self.SUPPORT_RESOURCES_DIRPATH/"static-info.json"
+        with STATIC_INFO_FILE.open("r") as f:
+            static_info = json.loads(f.read())
+
+        # Make the spa page with embedded page database
+        html = self.SPA_TEMPLATE.render(
+            title=self.site_config.title,
+            name=self.site_config.name,
+            author=self.site_config.author,
+            footer=self.site_config.footer,
+            home_addr=self.site_config.home_addr,
+            css_file = static_info["docd_css_file"],
+            js_file = static_info["docd_js_file"],
+            rh=uuid.uuid4().hex[:6]
+        )
+        with Path(self.DEST_ROOT/"index.html").open("w") as f:
+            f.write(html)
 
     def build_docs(self):
-        self._build_dest_directory_structure()
+        self._build_setup()
+        self.DEST_ROOT_DB.mkdir(exist_ok=True)
 
         # Synchronize the media folder
         media_src = self.SOURCE_ROOT/"_media"
         if media_src.is_dir():
-            c,o,e = rsync(media_src,self.DEST_MEDIA_DIR,delete=True)
+            media_dest = self.DEST_ROOT/"_media"
+            media_dest.mkdir(exist_ok=True)
+            c,o,e = rsync(media_src,media_dest,delete=True)
             if c != 0:
                 print(c,o,e)
                 raise Exception("Rsync of _media failed")
 
         # Parse the docs directory
         self.doc_nodes = []
-        root_node = self._unpack_source_directory(self.SOURCE_ROOT,max_depth=self.max_directory_depth)
+        root_node = self._unpack_dirs(self.SOURCE_ROOT,max_depth=self.max_directory_depth)
 
         # Write out the page database to a json file
-        with self.DEST_PAGES_DB_FILE.open("w") as f:
+        with Path(self.DEST_ROOT_DB/"page-db.json").open("w") as f:
             db = json.dumps([ e.to_dict() for e in self.doc_nodes ],indent=4)
             f.write(db)
 
@@ -116,31 +130,28 @@ class Publisher:
 
             # Determine paths
             source = self.SOURCE_ROOT/info.source_path
-            dest = self.DEST_PAGES_HTML_DIR/info.db_uri
+            dest = self.DEST_ROOT_DB/info.db_uri
 
             # Ensure the folder exists
             dest.parent.mkdir(parents=True,exist_ok=True)
 
             # Add the contents
             language = self.FILE_MAP.get(source.suffix,"")
-            content = self._create_html_page(source,language)
+            content = self._render_page(source,language)
 
             # Write the file
             with dest.open("w") as f:
                 f.write(content)
 
 
-    #-- Source walker and Page Makers ------------------------------------------------------#
+    def _unpack_dirs(self, directory_path, depth=0, max_depth=100000):
 
-    def _unpack_source_directory(self, directory_path, depth=0, max_depth=100000):
         # Calculate directory relpath
         directory_relpath = directory_path.relative_to(self.SOURCE_ROOT)
-
         # If we are the root, set the parent as None
         directory_parent_uri = str(directory_relpath.parent)
         if str(directory_relpath) == ".":
             directory_parent_uri = None
-
         # Display name exchanges '--' for ': '
         directory_display_name = directory_relpath.name.replace("--",": ")
 
@@ -202,10 +213,10 @@ class Publisher:
 
             # If this is a directory, recurse or return depending on depth
             elif child_path.is_dir() and depth+1 <= max_depth:
-                subnode = self._unpack_source_directory(child_path,depth=depth+1,max_depth=max_depth)
+                subnode = self._unpack_dirs(child_path,depth=depth+1,max_depth=max_depth)
 
 
-    def _create_html_page(self, source_path, language):
+    def _render_page(self, source_path, language):
         if language == "markdown":
             return make_html(source_path.read_text())
         else:
