@@ -93,12 +93,6 @@ if __name__ == "__main__":
     subp_publish.add_argument("-f","--filepath",default=None)
     subp_clean = subparsers.add_parser("clean", help="Clean out the docd site")
 
-    # Serve
-    subp_serve = subparsers.add_parser("serve", help="Serve the document")
-    subp_serve.add_argument("-p","--port", help="port", type=int, default=DEFAULT_PORT)
-    subp_serve.add_argument("--open",action="store_true",help="Open server to exterior connections")
-    subp_serve.add_argument("--allowed",nargs="*",type=str,default=None)
-
     # Push
     subp_push = subparsers.add_parser("push", help="Push docs to a remote")
 
@@ -109,7 +103,7 @@ if __name__ == "__main__":
     subp_info = subparsers.add_parser("info", help="Print info on the repo config")
 
     # Helper Methods
-    subp_newserver = subparsers.add_parser("newserver", help="Run the new server")
+    subp_devserver = subparsers.add_parser("devserver", help="Run the new server")
 
     #-- Process args -----------------------------------------------------------#
 
@@ -178,11 +172,6 @@ if __name__ == "__main__":
                 else:
                     fp.unlink()
 
-        case "serve":
-            import docd.cmd_serve as SERVE
-            args.directory = ctx.DOCS_DIST_DIRPATH
-            SERVE.main_run(args)
-
         case "check":
             import docd.cmd_check as CHECK
             CHECK.main_run(ctx,config)
@@ -213,13 +202,13 @@ if __name__ == "__main__":
             c,o,e = proc(cmd)
             print(c,o,e)
 
-        case "newserver":
+        case "devserver":
 
             import asyncio
             from docd.server_new import DocdDevServer
 
             # Load the new spa page template
-            SPA_TEMPLATE_PATH = Path("support/templates/spa-NEW.html")
+            SPA_TEMPLATE_PATH = Path("support/templates/spa.html")
             with SPA_TEMPLATE_PATH.open("r") as fp:
                 SPA_TEMPLATE = fp.read()
 
