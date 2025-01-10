@@ -1,4 +1,3 @@
 # Ignore python artifacts
-/venv/
 *.pyc
 

@@ -1,11 +1,10 @@
 # Todo
 
 * [ ] Unpack what all the current cli do and where things have to live
-* [ ] Switch to a tornado based local server system
-    * [ ] Keep it simple for now
-* [ ] Make a faster basic watcher vite builder
-    * [ ] Make it inject the source properly somewhere
-* [ ] have search only fetch the search-index on the initial grab
+
+
+
+
 * [ ] Switch to "modern" global store $G pattern vs the $M pattern
 * [ ] Enable the tornado in dev mode to request a page markdown rebuilt on the fly
     * [ ] basically, if I'm editing the source git file, if I just refresh, get the new one
