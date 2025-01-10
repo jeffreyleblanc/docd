@@ -205,7 +205,7 @@ if __name__ == "__main__":
         case "devserver":
 
             import asyncio
-            from docd.server_new import DocdDevServer
+            from docd.devserver import DocdDevServer
 
             # Load the new spa page template
             SPA_TEMPLATE_PATH = Path("support/templates/spa.html")
