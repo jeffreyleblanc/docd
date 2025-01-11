@@ -46,6 +46,22 @@ export default class DataManager {
         this._setup_theme();
 
         this._is_search_index_fetched = false;
+
+        // Track if we've loaded or not
+        this._page_data_loaded = false;
+        this._page_data_loaded_state_hold = null;
+    }
+
+    async start(){
+        // Fetch the database
+        await this._fetch_database();
+        this._page_data_loaded = true;
+
+        // If have a state ready, apply it
+        if(this._page_data_loaded_state_hold!=null){
+            const {name,params} = this._page_data_loaded_state_hold;
+            this.load_page_by_uri(name,params);
+        }
     }
 
     //-- Search System -------------------------------------------------------------------------//
@@ -129,13 +145,6 @@ export default class DataManager {
 
     //-- Data --------------------------------------------//
 
-        async start(){
-            // Fetch the database
-            await this._fetch_database();
-
-            console.warn("Need to update logic for first load!!!")
-        }
-
         async _fetch_database(){
             const resp = await window.fetch(`${this.URLS.db_root}/pages-database.json?h=${random_string()}`);
             console.log("DB resp:",resp);
@@ -195,8 +204,13 @@ export default class DataManager {
 
     //-- Page Loading ------------------------------------------------------------------//
 
-        async load_page_by_uri(page_uri){
-            console.log("load_page_by_uri!!!!",page_uri)
+        async load_page_by_uri(name,params){
+            if(!this._page_data_loaded){
+                this._page_data_loaded_state_hold = {name,params};
+                return;
+            }
+
+            const page_uri = params.pagepath.join("/")
             try {
                 // Close error if open
                 this._uistate.error_open = false;

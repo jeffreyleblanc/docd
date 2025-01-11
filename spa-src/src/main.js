@@ -39,13 +39,16 @@ function main(){
     // Wire the path logic here so we pickup initial state
     G.router.beforeEach((to,from)=>{
         const {name,params} = to;
+        console.log("ROUTER:from",from)
+        console.log("ROUTER::to",name,params)
         if("home" == name){
             // pass
         }
         else if("pageview" == name){
             console.log("ROUTER::to",name,params)
             // LOAD THE PAGE
-            G.mng.load_page_by_uri(params.pagepath.join("/"));
+            // G.mng.load_page_by_uri(params.pagepath.join("/"));
+            G.mng.load_page_by_uri(name,params);
         }
     })
 
