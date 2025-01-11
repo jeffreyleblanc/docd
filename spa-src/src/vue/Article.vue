@@ -3,7 +3,7 @@
 SPDX-FileCopyRightText: Copyright (c) 2023-present Jeffrey LeBlanc
 SPDX-License-Indentifier: MIT
 -->
-<main> <!-- Classes applied in the parent -->
+<main class="ui-child-expand ui-parent-row">
     <div class="show-when-desktop-block ui-nav-w pl-8 h-full"/>
     <div class="ui-child-expand ui-parent-col">
         <ArticleHeader/>

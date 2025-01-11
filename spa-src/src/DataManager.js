@@ -7,7 +7,9 @@ import {random_string} from "./utils.js"
 
 export default class DataManager {
 
-    constructor(config){
+    constructor(G, config){
+
+        this.$G = G;
 
         this.URLS = {
             db_root: "/_resources",
@@ -131,12 +133,7 @@ export default class DataManager {
             // Fetch the database
             await this._fetch_database();
 
-            // Check if we have a current hash and load that
-            const curr_hash = document.location.hash;
-            if(curr_hash.startsWith("#")){
-                const page_uri = curr_hash.substring(1).trim();
-                this.load_page_by_uri(page_uri);
-            }
+            console.warn("Need to update logic for first load!!!")
         }
 
         async _fetch_database(){
@@ -198,7 +195,14 @@ export default class DataManager {
 
     //-- Page Loading ------------------------------------------------------------------//
 
+        go_to_page(pagepath){
+            console.log("go_to_page",pagepath)
+            // The path is split to handle / not being escaped
+            this.$G.router.push({name:"pageview",params:{pagepath:pagepath.split("/")}});
+        }
+
         async load_page_by_uri(page_uri){
+            console.log("load_page_by_uri!!!!",page_uri)
             try {
                 // Close error if open
                 this._uistate.error_open = false;
@@ -217,9 +221,6 @@ export default class DataManager {
                 this._uistate.error_open = true;
                 this._uistate.error_msg = `Failed to load ${page_uri}`;
             }
-
-            // Update the hash location
-            window.location.hash = page_uri;
 
             // If we are mobile, make sure to close the nav tray
             if(this._uistate.is_mobile){

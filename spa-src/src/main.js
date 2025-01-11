@@ -6,9 +6,13 @@ import "./css/index.css"
 
 // Core Javascript and Vue Files
 import {createApp} from "vue"
+import { createWebHistory, createRouter } from "vue-router"
 import {G} from "./global.js"
 import DataManager from "./DataManager.js"
 import MainApp from "./vue/MainApp.vue"
+
+import HomeView from "./vue/HomeView.vue"
+import Article from "./vue/Article.vue"
 
 function main(){
     // Get the config
@@ -19,11 +23,36 @@ function main(){
     }
 
     // Make a data manager
-    G.mng = new DataManager(config);
+    G.mng = new DataManager(G,config);
+
+    const routes = [
+        { name: "home", path: '/', component: HomeView },
+        // see https://router.vuejs.org/guide/essentials/route-matching-syntax#Repeatable-params
+        { name: "pageview", path: '/:pagepath+', component: Article },
+    ]
+
+    G.router = createRouter({
+        history: createWebHistory(),
+        routes,
+    })
+
+    // Wire the path logic here so we pickup initial state
+    G.router.beforeEach((to,from)=>{
+        const {name,params} = to;
+        if("home" == name){
+            // pass
+        }
+        else if("pageview" == name){
+            console.log("ROUTER::to",name,params)
+            // LOAD THE PAGE
+            G.mng.load_page_by_uri(params.pagepath.join("/"));
+        }
+    })
 
     // Create the main app and mount it
     G.app = createApp(MainApp);
     G.app.use(G);
+    G.app.use(G.router)
     G.app.mount("#mount");
 
     // Start

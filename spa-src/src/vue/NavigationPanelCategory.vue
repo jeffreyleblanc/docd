@@ -32,6 +32,11 @@ SPDX-License-Indentifier: MIT
             >
                 {{page.display_name}}
             </span>
+            <!--
+            <router-link :to="{ name: 'profile', params: { username: 'erina' } }">
+              User profile
+            </router-link>
+            -->
         </div>
     </div>
 </div>
@@ -63,7 +68,8 @@ export default {
     },
     methods: {
         load_page(page_obj){
-            this.$M.load_page_by_uri(page_obj.uri);
+            // Change to direct interface to the router
+            this.$M.go_to_page(page_obj.uri);
         }
     }
 }

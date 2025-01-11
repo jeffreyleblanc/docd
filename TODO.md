@@ -4,7 +4,7 @@
 
 UI
 
-* [ ] Switch to "modern" global store $G pattern vs the $M pattern
+* [x] Switch to "modern" global store $G pattern vs the $M pattern
     * just note how this works for now
 * [ ] vue router
     * [ ] implement it

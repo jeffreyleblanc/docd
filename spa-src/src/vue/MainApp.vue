@@ -4,7 +4,8 @@ SPDX-FileCopyRightText: Copyright (c) 2023-present Jeffrey LeBlanc
 SPDX-License-Indentifier: MIT
 -->
 <div class="ui-spa-root ui-parent-stack font-sans th-core-bg-base th-core-text-base">
-    <Article class="ui-child-expand ui-parent-row"/>
+
+    <RouterView/>
 
     <!-- Transparency used when nav slides out -->
     <div v-show="show_nav" class="show-when-mobile-block ui-child-expand bg-black opacity-75"/>
@@ -15,11 +16,10 @@ SPDX-License-Indentifier: MIT
 
 <script>
 import NavigationPanel from "./NavigationPanel.vue"
-import Article from "./Article.vue"
 
 export default {
     data(){ return {} },
-    components: { NavigationPanel, Article },
+    components: { NavigationPanel },
     computed: {
         show_nav: {
             get(){ return this.$M.uistate.show_nav; },
