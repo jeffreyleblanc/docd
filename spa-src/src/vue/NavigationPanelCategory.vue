@@ -26,17 +26,9 @@ SPDX-License-Indentifier: MIT
             v-for="page in node.files"
             :key="page.display_name"
         >
-            <span class="cursor-pointer"
-                  :class="(page.uri==current_uri)?'th-accent-text font-medium':'th-core-text-soft'"
-                  @click="load_page(page)"
-            >
+            <RouterLink :to='{name:"pageview",params:{pagepath:page.uri.split("/")}}'>
                 {{page.display_name}}
-            </span>
-            <!--
-            <router-link :to="{ name: 'profile', params: { username: 'erina' } }">
-              User profile
-            </router-link>
-            -->
+            </RouterLink>
         </div>
     </div>
 </div>
@@ -64,12 +56,6 @@ export default {
         open: {
             get(){ return this.node._is_open; },
             set(val){ this.node._is_open = val; }
-        }
-    },
-    methods: {
-        load_page(page_obj){
-            // Change to direct interface to the router
-            this.$M.go_to_page(page_obj.uri);
         }
     }
 }

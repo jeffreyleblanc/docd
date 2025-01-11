@@ -26,9 +26,9 @@ function main(){
     G.mng = new DataManager(G,config);
 
     const routes = [
-        { name: "home", path: '/', component: HomeView },
+        { name: "home", path: "/", component: HomeView },
         // see https://router.vuejs.org/guide/essentials/route-matching-syntax#Repeatable-params
-        { name: "pageview", path: '/:pagepath+', component: Article },
+        { name: "pageview", path: "/view/:pagepath+", component: Article },
     ]
 
     G.router = createRouter({

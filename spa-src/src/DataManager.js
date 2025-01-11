@@ -195,12 +195,6 @@ export default class DataManager {
 
     //-- Page Loading ------------------------------------------------------------------//
 
-        go_to_page(pagepath){
-            console.log("go_to_page",pagepath)
-            // The path is split to handle / not being escaped
-            this.$G.router.push({name:"pageview",params:{pagepath:pagepath.split("/")}});
-        }
-
         async load_page_by_uri(page_uri){
             console.log("load_page_by_uri!!!!",page_uri)
             try {
