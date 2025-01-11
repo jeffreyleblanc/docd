@@ -3,14 +3,13 @@
 
 // CSS Entrypoint
 import "./css/index.css"
-
 // Core Javascript and Vue Files
 import {createApp} from "vue"
 import { createWebHistory, createRouter } from "vue-router"
+// Local Files
 import {G} from "./global.js"
 import DataManager from "./DataManager.js"
 import MainApp from "./vue/MainApp.vue"
-
 import HomeView from "./vue/HomeView.vue"
 import Article from "./vue/Article.vue"
 
@@ -39,16 +38,12 @@ function main(){
     // Wire the path logic here so we pickup initial state
     G.router.beforeEach((to,from)=>{
         const {name,params} = to;
-        console.log("ROUTER:from",from)
-        console.log("ROUTER::to",name,params)
-        if("home" == name){
-            // pass
-        }
-        else if("pageview" == name){
-            console.log("ROUTER::to",name,params)
-            // LOAD THE PAGE
-            // G.mng.load_page_by_uri(params.pagepath.join("/"));
-            G.mng.load_page_by_uri(name,params);
+        switch(name){
+            case "home":
+                break;
+            case "pageview":
+                G.mng.load_page_view(name,params);
+                break;
         }
     })
 

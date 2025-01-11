@@ -8,15 +8,16 @@ import {random_string} from "./utils.js"
 export default class DataManager {
 
     constructor(G, config){
-
+        // Access the global
         this.$G = G;
 
-        this.URLS = {
+        // Our API URLS
+        this.API_URLS = {
             db_root: "/_resources",
             search_index: "/_resources/search/serialized-index.json"
         }
 
-
+        // Reactive uistate
         this._uistate = reactive({
             is_mobile: false,
             show_nav: false,
@@ -25,6 +26,7 @@ export default class DataManager {
             error_msg: ""
         });
 
+        // Reactive data store
         this._data = reactive({
             // Names
             name: config.name,
@@ -43,13 +45,15 @@ export default class DataManager {
             search_results: []
         });
 
-        this._setup_theme();
-
-        this._is_search_index_fetched = false;
-
-        // Track if we've loaded or not
+        // Track if we've loaded page data or not
         this._page_data_loaded = false;
         this._page_data_loaded_state_hold = null;
+
+        // Track if the search index is loaded
+        this._is_search_index_loaded = false;
+
+        // Setup the theme
+        this._setup_theme();
     }
 
     async start(){
@@ -60,30 +64,9 @@ export default class DataManager {
         // If have a state ready, apply it
         if(this._page_data_loaded_state_hold!=null){
             const {name,params} = this._page_data_loaded_state_hold;
-            this.load_page_by_uri(name,params);
+            this.load_page_view(name,params);
         }
     }
-
-    //-- Search System -------------------------------------------------------------------------//
-
-        async load_search_system(){
-            // could make a "search_available" uistate
-            const resp = await window.fetch(this.URLS.search_index);
-            const resp_obj = await resp.json();
-            this.search_index = lunr.Index.load(resp_obj);
-            this._is_search_index_fetched = true;
-        }
-
-        async trigger_search(search_text){
-            if(! this._is_search_index_fetched){
-                await this.load_search_system();
-            }
-            console.log("run search on:",search_text)
-            const results = this.search_index.search(search_text);
-            console.log("got:",results)
-            this._data.has_search_result = true;
-            this._data.search_results = Object.freeze(results);
-        }
 
     //-- Vue Hooks --------------------------------------------//
 
@@ -146,7 +129,7 @@ export default class DataManager {
     //-- Data --------------------------------------------//
 
         async _fetch_database(){
-            const resp = await window.fetch(`${this.URLS.db_root}/pages-database.json?h=${random_string()}`);
+            const resp = await window.fetch(`${this.API_URLS.db_root}/pages-database.json?h=${random_string()}`);
             console.log("DB resp:",resp);
             const objects = await resp.json();
             console.log("DB objs:",objects)
@@ -204,13 +187,13 @@ export default class DataManager {
 
     //-- Page Loading ------------------------------------------------------------------//
 
-        async load_page_by_uri(name,params){
+        async load_page_view(name,params){
             if(!this._page_data_loaded){
                 this._page_data_loaded_state_hold = {name,params};
                 return;
             }
 
-            const page_uri = params.pagepath.join("/")
+            const page_uri = params.pagepath.join("/");
             try {
                 // Close error if open
                 this._uistate.error_open = false;
@@ -221,7 +204,7 @@ export default class DataManager {
 
                 // Fetch and set info
                 this._data.current_uri = page_uri;
-                const resp = await window.fetch(`${this.URLS.db_root}/pages-html/${db_uri}?h=${random_string()}`);
+                const resp = await window.fetch(`${this.API_URLS.db_root}/pages-html/${db_uri}?h=${random_string()}`);
                 const text = await resp.text();
                 this._data.current_html = text;
             }catch(err){
@@ -233,6 +216,27 @@ export default class DataManager {
             // If we are mobile, make sure to close the nav tray
             if(this._uistate.is_mobile){
                 this._uistate.show_nav = false; }
+        }
+
+    //-- Search System -------------------------------------------------------------------------//
+
+        async load_search_system(){
+            // could make a "search_available" uistate
+            const resp = await window.fetch(this.API_URLS.search_index);
+            const resp_obj = await resp.json();
+            this.search_index = lunr.Index.load(resp_obj);
+            this._is_search_index_loaded = true;
+        }
+
+        async trigger_search(search_text){
+            if(! this._is_search_index_loaded){
+                await this.load_search_system();
+            }
+            console.log("run search on:",search_text)
+            const results = this.search_index.search(search_text);
+            console.log("got:",results)
+            this._data.has_search_result = true;
+            this._data.search_results = Object.freeze(results);
         }
 
 }
