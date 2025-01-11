@@ -6,6 +6,7 @@ from pathlib import Path
 import json
 import uuid
 from dataclasses import dataclass
+import datetime
 # Lunr
 from lunr import lunr
 # Local
@@ -25,6 +26,7 @@ class DocNode:
     source_path: Path               # this is the relative filepath in the docs raw source
     display_name: str               # this is the name of the directory or file as displayed in the SPA
     display_suffix: str = None      # this is the suffix, if applicable, to be displayed in the SPA
+    last_modified: datetime.datetime = None
 
     def to_dict(self):
         return {
@@ -35,7 +37,8 @@ class DocNode:
             "db_uri": str(self.db_uri),
             "source_path": str(self.source_path),
             "display_name": self.display_name,
-            "display_suffix": self.display_suffix
+            "display_suffix": self.display_suffix,
+            "last_modified": self.last_modified.isoformat()
         }
 
 class Publisher:
@@ -177,6 +180,9 @@ class Publisher:
         # Display name exchanges '--' for ': '
         directory_display_name = directory_relpath.name.replace("--",": ")
 
+        # Get the modified time
+        modified_time = datetime.datetime.fromtimestamp(directory_path.stat().st_mtime)
+
         # Add the node for this directory
         self.doc_nodes.append(DocNode(
             kind = "directory",
@@ -186,7 +192,8 @@ class Publisher:
             db_uri = directory_relpath,
             source_path = directory_relpath,
             display_name = directory_display_name,
-            display_suffix = None
+            display_suffix = None,
+            last_modified = modified_time
         ))
 
         # Traverse the sources
@@ -221,6 +228,9 @@ class Publisher:
                 # Display name exchanges '--' for ': '
                 child_display_name = child_relpath.stem.replace("--",": ")
 
+                # Get the modified time
+                modified_time = datetime.datetime.fromtimestamp(child_path.stat().st_mtime)
+
                 # Add the node for this file
                 self.doc_nodes.append(DocNode(
                     kind = "file",
@@ -230,7 +240,8 @@ class Publisher:
                     db_uri = child_db_uri,
                     source_path = child_relpath,
                     display_name = child_display_name,
-                    display_suffix = _suffix
+                    display_suffix = _suffix,
+                    last_modified = modified_time
                 ))
 
             # If this is a directory, recurse or return depending on depth
