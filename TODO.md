@@ -4,16 +4,12 @@
 
 UI
 
-* [x] Switch to "modern" global store $G pattern vs the $M pattern
-    * just note how this works for now
-* [ ] vue router
-    * [ ] implement it
-    * [ ] switch to using non hash addressing
 * [ ] For each page
     * [ ] Be able to show the raw source as well
-    * [ ] Show timestamp for a file
+    * [ ] Show timestamp for a file (at top)
 * [ ] Update the ui in some initially simple ways
     * [ ] Have a top nav bar that works desktop and mobile
+    * [ ] Cleanup / Explain the current structure better
     * [ ] have the search look a bit more like tailwind
         * [ ] check how that looks/works on mobile
 

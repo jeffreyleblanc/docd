@@ -38,7 +38,14 @@ export default {
             set(val){ this.$M.uistate.show_nav = val; }
         },
         error_open(){ return this.$M.uistate.error_open; },
-        error_msg(){ return this.$M.uistate.error_msg; }
+        error_msg(){ return this.$M.uistate.error_msg; },
+        current_html(){ return this.$M.data.current_html; },
+    },
+    watch: {
+        // When we set a new article, make sure we are at the top
+        current_html(new_val,old_val){
+            this.$refs.article_container.scrollTop = 0;
+        }
     }
 }
 </script>

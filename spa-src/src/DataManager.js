@@ -185,6 +185,17 @@ export default class DataManager {
             }
         }
 
+    //-- Error System ------------------------------------------------------------------//
+
+        clear_errors(){
+            this._uistate.error_open = false;
+        }
+
+        set_error(error_msg){
+            this._uistate.error_open = true;
+            this._uistate.error_msg = error_msg;
+        }
+
     //-- Page Loading ------------------------------------------------------------------//
 
         async load_page_view(name,params){
@@ -196,7 +207,7 @@ export default class DataManager {
             const page_uri = params.pagepath.join("/");
             try {
                 // Close error if open
-                this._uistate.error_open = false;
+                this.clear_errors();
 
                 // Find the page node and get the db_uri
                 const page_obj = this._data.nodes_by_uri.get(page_uri);
@@ -209,8 +220,7 @@ export default class DataManager {
                 this._data.current_html = text;
             }catch(err){
                 console.error("Error loading page:",page_uri,err);
-                this._uistate.error_open = true;
-                this._uistate.error_msg = `Failed to load ${page_uri}`;
+                this.set_error(`Failed to load ${page_uri}`);
             }
 
             // If we are mobile, make sure to close the nav tray
