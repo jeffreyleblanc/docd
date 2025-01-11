@@ -2,11 +2,6 @@
 
 **SPRINT**
 
-Data
-
-* [x] Add last modified timestamp to the pages database
-* [ ] Copy over the raw files into `_resources` as `.txt` files regardless of type
-
 UI
 
 * [ ] Switch to "modern" global store $G pattern vs the $M pattern
@@ -44,3 +39,4 @@ Close Out and Deploy
     * maybe use our nested system as an option
 * enable basic editing that for files within git repos
     * optional... only if running as a dev mode
+* make the page-build step smarter about only building/copying changes
