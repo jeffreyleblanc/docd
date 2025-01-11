@@ -7,6 +7,7 @@ import json
 import uuid
 from dataclasses import dataclass
 import datetime
+import shutil
 # Lunr
 from lunr import lunr
 # Local
@@ -58,6 +59,7 @@ class Publisher:
         self.DEST_RESOURCES_DIR = ctx.DOCS_DIST_DIRPATH/"_resources"
         self.DEST_PAGES_DB_FILE = self.DEST_RESOURCES_DIR/"pages-database.json"
         self.DEST_PAGES_HTML_DIR = self.DEST_RESOURCES_DIR/"pages-html"
+        self.DEST_PAGES_TXT_DIR =  self.DEST_RESOURCES_DIR/"pages-txt"
         self.DEST_MEDIA_DIR = self.DEST_RESOURCES_DIR/"media"
         self.DEST_SEARCH_DIR = self.DEST_RESOURCES_DIR/"search"
         self.DEST_SEARCH_INDEX_FILE = self.DEST_SEARCH_DIR/"serialized-index.json"
@@ -75,6 +77,7 @@ class Publisher:
         # Make all of our subdirectories
         self.DEST_RESOURCES_DIR.mkdir(exist_ok=True)
         self.DEST_PAGES_HTML_DIR.mkdir(exist_ok=True)
+        self.DEST_PAGES_TXT_DIR.mkdir(exist_ok=True)
         self.DEST_MEDIA_DIR.mkdir(exist_ok=True)
         self.DEST_SEARCH_DIR.mkdir(exist_ok=True)
         self.DEST_STATIC_DIR.mkdir(exist_ok=True)
@@ -99,6 +102,7 @@ class Publisher:
             f.write(db)
 
         # Render the pages
+        # ==> could be made smarter to only create new/modified sources
         for info in self.doc_nodes:
             if info.kind == "directory":
                 continue
@@ -117,6 +121,22 @@ class Publisher:
             # Write the file
             with dest.open("w") as f:
                 f.write(content)
+
+        # Copy over the raw pages
+        # ==> could be made smarter to only copy changes
+        for info in self.doc_nodes:
+            if info.kind == "directory":
+                continue
+
+            # Determine paths
+            source = self.SOURCE_ROOT/info.source_path
+            dest = self.DEST_PAGES_TXT_DIR/f"{info.uri}.txt"
+
+            # Ensure the folder exists
+            dest.parent.mkdir(parents=True,exist_ok=True)
+
+            # Copy the file
+            shutil.copy(source,dest)
 
 
     def _create_html_page(self, source_path, language):

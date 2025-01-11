@@ -4,7 +4,7 @@
 
 Data
 
-* [ ] Add last modified timestamp to the pages database
+* [x] Add last modified timestamp to the pages database
 * [ ] Copy over the raw files into `_resources` as `.txt` files regardless of type
 
 UI
