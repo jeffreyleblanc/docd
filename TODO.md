@@ -5,8 +5,8 @@
 UI
 
 * [ ] For each page
-    * [ ] Be able to show the raw source as well
     * [ ] Show timestamp for a file (at top)
+    * [ ] Be able to show the raw source as well
 * [ ] Update the ui in some initially simple ways
     * [ ] Have a top nav bar that works desktop and mobile
     * [ ] Cleanup / Explain the current structure better

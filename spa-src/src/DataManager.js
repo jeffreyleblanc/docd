@@ -40,6 +40,7 @@ export default class DataManager {
             // Current data
             current_uri: "",
             current_html: "",
+            current_node: null,
             // Search data
             has_search_result: false,
             search_results: []
@@ -212,6 +213,8 @@ export default class DataManager {
                 // Find the page node and get the db_uri
                 const page_obj = this._data.nodes_by_uri.get(page_uri);
                 const db_uri = page_obj.db_uri;
+
+                this._data.current_node = page_obj;
 
                 // Fetch and set info
                 this._data.current_uri = page_uri;
