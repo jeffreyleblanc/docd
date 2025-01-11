@@ -24,7 +24,6 @@ function main(){
     // Create the main app and mount it
     G.app = createApp(MainApp);
     G.app.use(G);
-    G.app.use(G.mng);
     G.app.mount("#mount");
 
     // Start

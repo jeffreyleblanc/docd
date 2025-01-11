@@ -67,11 +67,7 @@ export default class DataManager {
             this._data.search_results = Object.freeze(results);
         }
 
-    //-- Vue Hooks and Providers --------------------------------------------//
-
-        install(app, options){
-            app.config.globalProperties.$M = this;
-        }
+    //-- Vue Hooks --------------------------------------------//
 
         get uistate(){ return this._uistate; }
         get data(){ return this._data; }
