@@ -28,11 +28,7 @@ SPDX-License-Indentifier: MIT
 
     <!-- Search Modal -->
     <div v-show="show_search" class="ui-child-expand bg-black opacity-75"/>
-    <div v-if="show_search" class="ui-child-expand ui-parent-stack">
-        <div class="ui-child-center-x top-[4rem] w-1/2 h-1/2 bg-green-700">
-            Search modal
-        </div>
-    </div>
+    <SearchModal v-if="show_search"/>
 </div>
 </template>
 
@@ -40,10 +36,11 @@ SPDX-License-Indentifier: MIT
 import OnMobileHeader from "./OnMobileHeader.vue"
 import ArticleFooter from "./ArticleFooter.vue"
 import NavigationPanel from "./NavigationPanel.vue"
+import SearchModal from "./SearchModal.vue"
 
 export default {
     data(){ return {} },
-    components: { OnMobileHeader, ArticleFooter, NavigationPanel },
+    components: { OnMobileHeader, ArticleFooter, NavigationPanel, SearchModal },
     computed: {
         show_nav: {
             get(){ return this.$M.uistate.show_nav; },
