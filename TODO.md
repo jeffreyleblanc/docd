@@ -15,7 +15,8 @@ UI
     * [ ] have the search look a bit more like tailwind
     * [ ] check how that looks/works on mobile
 * [ ] Cleanup the UI as needed
-    * List TBD
+    * Article
+    * More
 
 
 Build System

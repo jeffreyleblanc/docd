@@ -23,7 +23,8 @@ export default class DataManager {
             show_nav: false,
             theme: "light",
             error_open: false,
-            error_msg: ""
+            error_msg: "",
+            article_view_mode: "rendered",
         });
 
         // Reactive data store
@@ -40,6 +41,7 @@ export default class DataManager {
             // Current data
             current_uri: "",
             current_html: "",
+            current_raw_text: "",
             current_node: null,
             // Search data
             has_search_result: false,
@@ -229,6 +231,18 @@ export default class DataManager {
             // If we are mobile, make sure to close the nav tray
             if(this._uistate.is_mobile){
                 this._uistate.show_nav = false; }
+
+            this._uistate.article_view_mode = "rendered";
+        }
+
+        async load_raw_text(){
+            // Fetch and set info
+            const raw_uri = `${this._data.current_node.uri}.txt`
+            const resp = await window.fetch(`${this.API_URLS.db_root}/pages-txt/${raw_uri}?h=${random_string()}`);
+            const raw_text = await resp.text();
+            this._data.current_raw_text = raw_text;
+            console.log("RAW TEXT=>",raw_text)
+            this._uistate.article_view_mode = "raw";
         }
 
     //-- Search System -------------------------------------------------------------------------//
