@@ -5,13 +5,17 @@
 UI
 
 * [ ] For each page
-    * [ ] Show timestamp for a file (at top)
+    * [x] Show timestamp for a file (at top)
     * [ ] Be able to show the raw source as well
 * [ ] Update the ui in some initially simple ways
     * [ ] Have a top nav bar that works desktop and mobile
     * [ ] Cleanup / Explain the current structure better
+    * [ ] Add modal holder for search on desktop
+* [ ] Search system
     * [ ] have the search look a bit more like tailwind
-        * [ ] check how that looks/works on mobile
+    * [ ] check how that looks/works on mobile
+* [ ] Cleanup the UI as needed
+    * List TBD
 
 
 Build System
