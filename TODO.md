@@ -4,19 +4,33 @@
 
 UI
 
-* [ ] For each page
-    * [x] Show timestamp for a file (at top)
-    * [ ] Be able to show the raw source as well
 * [ ] Update the ui in some initially simple ways
     * [ ] Have a top nav bar that works desktop and mobile
     * [ ] Cleanup / Explain the current structure better
     * [ ] Add modal holder for search on desktop
 * [ ] Search system
     * [ ] have the search look a bit more like tailwind
+        * bar
+          [ spyglass 'Quick search... Ctrl K'] => opens modal
+          modal
+            top [ spy glass  Search docs        [esc]]
+            under are the results
+            -> make enter trigger
+            -> esc closes it
     * [ ] check how that looks/works on mobile
+        * there is a spyglass icon, if you click brings up the modal
+    * make the search automatic as type, but with a debounce to the enter
+        * implement this in the DataManager
+    * use https://vuejs.org/guide/essentials/forms.html#trim
 * [ ] Cleanup the UI as needed
-    * Article
-    * More
+    * [ ] Article and rendered/raw
+        * Also update DataManager parts
+    * Determine more updates
+
+Markdown
+
+* [ ] Update the markdown
+    * Don't try to guess syntax 
 
 
 Build System
