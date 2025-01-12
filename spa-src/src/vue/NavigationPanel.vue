@@ -28,6 +28,10 @@ SPDX-License-Indentifier: MIT
             </button>
         </section>
         <section>
+            <button @click="open_search_modal">
+                Open search
+            </button>
+
             <input type="text" v-model="search_term" class="p-2 text-black"/>
             <button @click="run_search">
                 search
@@ -113,6 +117,9 @@ export default {
         run_search(){
             console.log("RUN SEARCH!!",this.search_term)
             this.$M.trigger_search(this.search_term);
+        },
+        open_search_modal(){
+            this.$M.uistate.show_search = true;
         }
     }
 }

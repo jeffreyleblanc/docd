@@ -21,6 +21,7 @@ export default class DataManager {
         this._uistate = reactive({
             is_mobile: false,
             show_nav: false,
+            show_search: false,
             theme: "light",
             error_open: false,
             error_msg: "",

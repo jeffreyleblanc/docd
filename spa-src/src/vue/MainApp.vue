@@ -20,10 +20,19 @@ SPDX-License-Indentifier: MIT
             </section>
         </div>
     </main>
+
     <!-- Transparency used when nav slides out -->
     <div v-show="show_nav" class="show-when-mobile-block ui-child-expand bg-black opacity-75"/>
     <!-- Navigation Panel -->
     <NavigationPanel v-show="show_nav" class="absolute pin-tl ui-parent-col ui-nav-w h-full th-core-bg-base"/>
+
+    <!-- Search Modal -->
+    <div v-show="show_search" class="ui-child-expand bg-black opacity-75"/>
+    <div v-if="show_search" class="ui-child-expand ui-parent-stack">
+        <div class="ui-child-center-x top-[4rem] w-1/2 h-1/2 bg-green-700">
+            Search modal
+        </div>
+    </div>
 </div>
 </template>
 
@@ -40,6 +49,7 @@ export default {
             get(){ return this.$M.uistate.show_nav; },
             set(val){ this.$M.uistate.show_nav = val; }
         },
+        show_search(){ return this.$M.uistate.show_search; },
         error_open(){ return this.$M.uistate.error_open; },
         error_msg(){ return this.$M.uistate.error_msg; },
         current_html(){ return this.$M.data.current_html; },
