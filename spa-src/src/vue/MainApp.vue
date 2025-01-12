@@ -27,7 +27,7 @@ SPDX-License-Indentifier: MIT
     <NavigationPanel v-show="show_nav" class="absolute pin-tl ui-parent-col ui-nav-w h-full th-core-bg-base"/>
 
     <!-- Search Modal -->
-    <div v-show="show_search" class="ui-child-expand bg-black opacity-75"/>
+    <div v-show="show_search" class="ui-child-expand bg-black/30 backdrop-blur-sm"/>
     <SearchModal v-if="show_search"/>
 </div>
 </template>
@@ -41,6 +41,15 @@ import SearchModal from "./SearchModal.vue"
 export default {
     data(){ return {} },
     components: { OnMobileHeader, ArticleFooter, NavigationPanel, SearchModal },
+    // Add global keyboard listeners for control of search modal
+    // NOTE: May be a better way to do this with https://vuejs.org/guide/essentials/event-handling
+    // Also see: https://vuejs.org/guide/essentials/lifecycle
+    mounted(){
+        document.addEventListener("keydown",this.key_event_controller);
+    },
+    beforeUnmount(){
+        document.removeEventListener("keydown",this.key_event_controller);
+    },
     computed: {
         show_nav: {
             get(){ return this.$M.uistate.show_nav; },
@@ -56,6 +65,22 @@ export default {
         current_html(new_val,old_val){
             this.$refs.article_container.scrollTop = 0;
         }
+    },
+    methods: {
+        key_event_controller(event) {
+            if(event.key == "k" && event.ctrlKey){
+                event.preventDefault();
+                if(!this.show_search){
+                    this.$M.uistate.show_search = true;
+                }
+            }
+            if(event.keyCode==27 || event.key == "Escape"){
+                if(this.show_search){
+                    event.preventDefault();
+                    this.$M.uistate.show_search = false;
+                }
+            }
+        },
     }
 }
 </script>
