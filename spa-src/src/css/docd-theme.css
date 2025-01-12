@@ -9,33 +9,35 @@ SPDX-License-Indentifier: MIT
 
     /*-- Theme and Colors ------------------------------------------------------------*/
 
+        /* Navigation Panel Width */
         .ui-nav-w {
-            @apply w-5/6 md:w-96;
+            @apply
+                w-5/6       /* on mobile  */
+                md:w-96     /* on desktop */
+            ;
         }
 
-        /* Main Color */
-
+        /* Main Background Colors */
         .th-core-bg-base      { @apply bg-white       dark:bg-core-950; }
         .th-core-bg-surface1  { @apply bg-core-100    dark:bg-core-900; }
         .th-core-bg-surface2  { @apply bg-core-300    dark:bg-core-800; }
         .th-core-bg-muted     { @apply bg-core-500    dark:bg-core-600; }
 
+        /* Main Text Colors */
         .th-core-text-pop     { @apply text-core-950  dark:text-core-50; }
         .th-core-text-base    { @apply text-core-800  dark:text-core-300; }
         .th-core-text-soft    { @apply text-core-800  dark:text-core-500; }
         .th-core-text-muted   { @apply text-core-500  dark:text-core-600; }
 
+        /* Main Border Colors */
         .th-core-border-base  { @apply border-core-300 dark:border-core-800; }
 
         /* Link Color */
-
         .th-link-text { @apply text-blue-600 dark:text-blue-500; }
 
-        /* Primary Color */
-
+        /* Accent Color */
         .th-accent-text        { @apply text-ltaccent-700     dark:text-dkaccent-500; }
         .th-accent-text-muted  { @apply text-ltaccent-700/50  dark:text-dkaccent-500/50; }
-
         .th-accent-border      { @apply border-ltaccent-600   dark:border-dkaccent-500; }
 
 }

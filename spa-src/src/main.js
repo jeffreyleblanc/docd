@@ -11,7 +11,7 @@ import {G} from "./global.js"
 import DataManager from "./DataManager.js"
 import MainApp from "./vue/MainApp.vue"
 import HomeView from "./vue/HomeView.vue"
-import Article from "./vue/Article.vue"
+import ArticleView from "./vue/ArticleView.vue"
 
 function main(){
     // Get the config
@@ -27,7 +27,7 @@ function main(){
     const routes = [
         { name: "home", path: "/", component: HomeView },
         // see https://router.vuejs.org/guide/essentials/route-matching-syntax#Repeatable-params
-        { name: "pageview", path: "/view/:pagepath+", component: Article },
+        { name: "pageview", path: "/view/:pagepath+", component: ArticleView },
     ]
 
     G.router = createRouter({

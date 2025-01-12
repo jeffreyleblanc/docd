@@ -6,14 +6,17 @@ SPDX-License-Indentifier: MIT
 <div class="ui-spa-root ui-parent-stack font-sans th-core-bg-base th-core-text-base">
     <!-- Main Content Container -->
     <main class="ui-child-expand ui-parent-row">
+        <!-- When on desktop add column to slide article over to the left -->
         <div class="show-when-desktop-block ui-nav-w pl-8 h-full"/>
+        <!-- Main Article Container -->
         <div class="ui-child-expand ui-parent-col">
-            <ArticleHeader/>
+            <OnMobileHeader/>
             <div v-if="error_open" class="py-2 px-4 bg-red-700 text-white">
                 {{error_msg}}
             </div>
             <section ref="article_container" class="ui-child-expand ui-parent-col ui-scroll-y">
                 <RouterView/>
+                <ArticleFooter/>
             </section>
         </div>
     </main>
@@ -25,13 +28,13 @@ SPDX-License-Indentifier: MIT
 </template>
 
 <script>
-import ArticleHeader from "./ArticleHeader.vue"
+import OnMobileHeader from "./OnMobileHeader.vue"
 import ArticleFooter from "./ArticleFooter.vue"
 import NavigationPanel from "./NavigationPanel.vue"
 
 export default {
     data(){ return {} },
-    components: { ArticleHeader, ArticleFooter, NavigationPanel },
+    components: { OnMobileHeader, ArticleFooter, NavigationPanel },
     computed: {
         show_nav: {
             get(){ return this.$M.uistate.show_nav; },
