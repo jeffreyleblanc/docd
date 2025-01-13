@@ -9,7 +9,7 @@ SPDX-License-Indentifier: MIT
             <div class="sq-4 mx-2">
                 <IconSearch/>
             </div>
-            <input type="text" v-model="local_search_term"
+            <input ref="search_input" type="text" v-model="local_search_term"
                 class="flex-1 p-2 bg-transparent border-0 focus:ring-0"
                 placeholder="Search documentation"
                 @keypress.enter="run_search"
@@ -44,6 +44,12 @@ export default {
     data(){ return {
         local_search_term: ""
     }},
+    mounted(){
+        // Focus on the search input when mount
+        this.$nextTick(()=>{
+            this.$refs.search_input.focus();
+        });
+    },
     components: { IconSearch },
     computed: {
         has_search_results(){ return this.$M.data.has_search_result },
