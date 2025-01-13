@@ -28,8 +28,19 @@ SPDX-License-Indentifier: MIT
             </button>
         </section>
         <section>
-            <button @click="open_search_modal">
-                Open search
+            <button
+                @click="open_search_modal"
+                class="ui-row items-center gap-x-4 min-h-8 max-h-8 px-4 th-core-bg-surface2 hover:th-core-bg-surface3 rounded-md"
+            >
+                <div class="sq-4">
+                    <IconSearch/>
+                </div>
+                <div class="pr-8">
+                    Quick search...
+                </div>
+                <div class="text-sm">
+                    Ctrl K
+                </div>
             </button>
         </section>
         <section class="text-sm flex flex-row items-center gap-x-2 th-core-text-base">
@@ -65,6 +76,7 @@ import IconCaretDown from "./icons/IconCaretDown.vue"
 import IconCaretRight from "./icons/IconCaretRight.vue"
 import IconGeoAltFill from "./icons/IconGeoAltFill.vue"
 import IconTextRight from "./icons/IconTextRight.vue"
+import IconSearch from "./icons/IconSearch.vue"
 import NavigationPanelCategory from "./NavigationPanelCategory.vue"
 
 export default {
@@ -73,6 +85,7 @@ export default {
         IconHouse, IconSun, IconMoon, IconMap, IconTextCenter, IconLargeX,
         IconGeoAltFill, IconTextRight,
         IconCaretDown, IconCaretRight,
+        IconSearch,
         NavigationPanelCategory,
     },
     computed: {
