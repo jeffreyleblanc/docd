@@ -4,34 +4,17 @@
 
 UI
 
-* [ ] Update the ui in some initially simple ways
-    * [ ] Have a top nav bar that works desktop and mobile
-    * [ ] Cleanup / Explain the current structure better
-    * [ ] Add modal holder for search on desktop
 * [ ] Search system
-    * [ ] have the search look a bit more like tailwind
-        * bar
-          [ spyglass 'Quick search... Ctrl K'] => opens modal
-          modal
-            top [ spy glass  Search docs        [esc]]
-            under are the results
-            -> make enter trigger
-            -> esc closes it
-    * [ ] check how that looks/works on mobile
-        * there is a spyglass icon, if you click brings up the modal
-    * make the search automatic as type, but with a debounce to the enter
-        * implement this in the DataManager
-    * use https://vuejs.org/guide/essentials/forms.html#trim
+    * [ ] Use https://vuejs.org/guide/essentials/forms.html#trim and don't search whitespace
 * [ ] Cleanup the UI as needed
     * [ ] Article and rendered/raw
-        * Also update DataManager parts
-    * Determine more updates
+        * [ ] Also update DataManager parts
+* [ ] Determine next step updates
 
 Markdown
 
 * [ ] Update the markdown
     * Don't try to guess syntax 
-
 
 Build System
 
@@ -44,6 +27,7 @@ Close Out and Deploy
 * [ ] Enable hosting sites to work with new output using caddy
 * [ ] Push as a test
 * [ ] Move the branch to master
+* [ ] Tag a release and version (in the cli too)
 * [ ] Push to github
 
 
@@ -57,3 +41,5 @@ Close Out and Deploy
 * enable basic editing that for files within git repos
     * optional... only if running as a dev mode
 * make the page-build step smarter about only building/copying changes
+* add different lunrjs search syntax cheatsheet
+* enabled arrows/tab to navigate the search results
