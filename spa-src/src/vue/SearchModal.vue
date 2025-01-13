@@ -5,7 +5,7 @@ SPDX-License-Indentifier: MIT
 -->
 <div class="ui-child-expand ui-parent-stack">
     <nav class="ui-child-center-x top-[4rem] w-1/2 h-1/2 ui-parent-col th-core-bg-surface2 th-core-text-base rounded-lg">
-        <section class="ui-row items-center h-16 border-b th-core-border-soft">
+        <section class="ui-row items-center h-16 px-4 border-b th-core-border-soft">
             <div class="sq-4 mx-2">
                 <IconSearch/>
             </div>
@@ -24,6 +24,7 @@ SPDX-License-Indentifier: MIT
             <template v-for="r in search_results" >
                 <RouterLink
                     :to='{name:"pageview",params:{pagepath:r.ref.split("/")}}'
+                    @click="close"
                     class="ui-row items-center px-4 min-h-16 max-h-16 border-b th-core-border-soft hover:th-accent-text hover:th-core-bg-surface3"
                 >
                     {{r.ref}}
