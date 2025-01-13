@@ -31,6 +31,8 @@ SPDX-License-Indentifier: MIT
 
         /* Main Border Colors */
         .th-core-border-base  { @apply border-core-300 dark:border-core-800; }
+        .th-core-border-soft  { @apply border-core-100 dark:border-core-600; }
+
 
         /* Link Color */
         .th-link-text { @apply text-blue-600 dark:text-blue-500; }

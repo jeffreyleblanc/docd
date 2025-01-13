@@ -21,5 +21,9 @@ export default {
     },
     variants: {
         extend: {},
-    }
+    },
+    plugins: [
+        require('@tailwindcss/forms'),
+        // ...
+    ],
 }

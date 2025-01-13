@@ -68,9 +68,7 @@ import IconTextRight from "./icons/IconTextRight.vue"
 import NavigationPanelCategory from "./NavigationPanelCategory.vue"
 
 export default {
-    data(){ return {
-        
-    } },
+    data(){ return {} },
     components: {
         IconHouse, IconSun, IconMoon, IconMap, IconTextCenter, IconLargeX,
         IconGeoAltFill, IconTextRight,

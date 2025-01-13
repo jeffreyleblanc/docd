@@ -7,6 +7,16 @@ SPDX-License-Indentifier: MIT
 
     ._throw-away {}
 
+    .ui-row {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .ui-col {
+        display: flex;
+        flex-direction: column;
+    }
+
     .ui-spa-root {
         height: 100vh;
         width: 100vw;
