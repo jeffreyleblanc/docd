@@ -101,7 +101,7 @@ export default {
             this.$M.toggle_all_directories(false);
         },
         open_search_modal(){
-            this.$M.uistate.show_search = true;
+            this.$M.open_search_modal();
         }
     }
 }

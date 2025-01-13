@@ -63,11 +63,10 @@ export default {
     },
     methods: {
         run_search(){
-            console.log("RUN SEARCH!!",this.local_search_term)
             this.$M.trigger_search(this.local_search_term);
         },
         close(){
-            this.$M.uistate.show_search = false;
+            this.$M.close_search_modal();
         }
     }
 }

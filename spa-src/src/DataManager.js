@@ -130,6 +130,17 @@ export default class DataManager {
             }
         }
 
+        open_search_modal(){
+            this._uistate.show_search = true;
+            this._data.has_search_result = false;
+            this._data.search_results = [];
+        }
+
+        close_search_modal(){
+            this._uistate.show_search = false;
+            // We only clear state on reopening
+        }
+
     //-- Data --------------------------------------------//
 
         async _fetch_database(){

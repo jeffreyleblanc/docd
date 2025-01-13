@@ -71,13 +71,13 @@ export default {
             if(event.key == "k" && event.ctrlKey){
                 event.preventDefault();
                 if(!this.show_search){
-                    this.$M.uistate.show_search = true;
+                    this.$M.open_search_modal();
                 }
             }
             if(event.keyCode==27 || event.key == "Escape"){
                 if(this.show_search){
                     event.preventDefault();
-                    this.$M.uistate.show_search = false;
+                    this.$M.close_search_modal();
                 }
             }
         },
