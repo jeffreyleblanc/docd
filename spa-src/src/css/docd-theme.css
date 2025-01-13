@@ -21,6 +21,7 @@ SPDX-License-Indentifier: MIT
         .th-core-bg-base      { @apply bg-white       dark:bg-core-950; }
         .th-core-bg-surface1  { @apply bg-core-100    dark:bg-core-900; }
         .th-core-bg-surface2  { @apply bg-core-300    dark:bg-core-800; }
+        .th-core-bg-surface3  { @apply bg-core-400    dark:bg-core-700; }
         .th-core-bg-muted     { @apply bg-core-500    dark:bg-core-600; }
 
         /* Main Text Colors */
@@ -31,7 +32,7 @@ SPDX-License-Indentifier: MIT
 
         /* Main Border Colors */
         .th-core-border-base  { @apply border-core-300 dark:border-core-800; }
-        .th-core-border-soft  { @apply border-core-100 dark:border-core-600; }
+        .th-core-border-soft  { @apply border-core-100 dark:border-core-700; }
 
 
         /* Link Color */

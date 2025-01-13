@@ -4,8 +4,8 @@ SPDX-FileCopyRightText: Copyright (c) 2023-present Jeffrey LeBlanc
 SPDX-License-Indentifier: MIT
 -->
 <div class="ui-child-expand ui-parent-stack">
-    <div class="ui-child-center-x top-[4rem] w-1/2 h-1/2 ui-parent-col th-core-bg-surface2 th-core-text-base rounded">
-        <div class="ui-row items-center p-2 border-b th-core-border-soft">
+    <nav class="ui-child-center-x top-[4rem] w-1/2 h-1/2 ui-parent-col th-core-bg-surface2 th-core-text-base rounded-lg">
+        <section class="ui-row items-center h-16 border-b th-core-border-soft">
             <div class="sq-4 mx-2">
                 <IconSearch/>
             </div>
@@ -19,21 +19,27 @@ SPDX-License-Indentifier: MIT
                     esc
                 </button>
             </div>
-        </div>
-        <div v-if="has_search_results" class="ui-col">
-            <div v-for="r in search_results" class="ui-row items-center px-4 py-2 border-b th-core-border-soft">
+        </section>
+        <section v-if="has_search_results && search_results.length>0" class="ui-col ui-child-expand ui-scroll-y">
+            <template v-for="r in search_results" >
                 <RouterLink
                     :to='{name:"pageview",params:{pagepath:r.ref.split("/")}}'
-                    class="hover:th-accent-text"
+                    class="ui-row items-center px-4 min-h-16 max-h-16 border-b th-core-border-soft hover:th-accent-text hover:th-core-bg-surface3"
                 >
                     {{r.ref}}
                 </RouterLink>
+            </template>
+        </section>
+        <section v-else class="ui-col ui-child-expand ui-scroll-y">
+            <div class="ui-row items-center px-4 min-h-16 max-h-16">
+                no results
             </div>
-        </div>
-        <div v-else>
-            waiting...
-        </div>
-    </div>
+        </section>
+        <section class="min-h-8 max-h-8 px-4 ui-row items-center border-t th-core-border-soft text-xs th-core-text-muted">
+            <span class="flex-1 h-1"/>
+            <span>powered by lunrjs</span>
+        </section>
+    </nav>
 </div>
 </template>
 
