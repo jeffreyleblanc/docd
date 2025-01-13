@@ -14,20 +14,25 @@ SPDX-License-Indentifier: MIT
                 placeholder="Search documentation"
                 @keypress.enter="run_search"
             />
-            <!-- <button @click="run_search">
-                search
-            </button> -->
             <div class="ui-row items-center p-2">
                 <button @click="close" class="th-core-bg-muted rounded px-2">
                     esc
                 </button>
             </div>
         </div>
-        <div v-if="has_search_results">
-            <span>RESULTS:</span>
-            <pre v-for="r in search_results" v-html="JSON.stringify(r)"/>
+        <div v-if="has_search_results" class="ui-col">
+            <div v-for="r in search_results" class="ui-row items-center px-4 py-2 border-b th-core-border-soft">
+                <RouterLink
+                    :to='{name:"pageview",params:{pagepath:r.ref.split("/")}}'
+                    class="hover:th-accent-text"
+                >
+                    {{r.ref}}
+                </RouterLink>
+            </div>
         </div>
-        <div v-else>No results</div>
+        <div v-else>
+            waiting...
+        </div>
     </div>
 </div>
 </template>
