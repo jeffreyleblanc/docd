@@ -22,17 +22,17 @@ export default class DataManager {
         // Reactive uistate
         this._uistate = reactive({
             is_mobile: false,
+            theme: "light",
             show_nav: false,
             show_search: false,
-            theme: "light",
             error_open: false,
             error_msg: "",
-            article_view_mode: "rendered",
+            article_view_mode: "rendered", // "rendered" | "raw"
         });
 
         // Reactive data store
         this._data = reactive({
-            // Names
+            // Project info
             name: config.name,
             footer_text: config.footer_text,
             home_addr: config.home_addr,
@@ -52,7 +52,7 @@ export default class DataManager {
         });
 
         // Track if we've loaded page data or not
-        this._page_data_loaded = false;
+        this._is_page_data_loaded = false;
         this._page_data_loaded_state_hold = null;
 
         // Track if the search index is loaded
@@ -64,8 +64,8 @@ export default class DataManager {
 
     async start(){
         // Fetch the database
-        await this._fetch_database();
-        this._page_data_loaded = true;
+        await this._fetch_page_database();
+        this._is_page_data_loaded = true;
 
         // If have a state ready, apply it
         if(this._page_data_loaded_state_hold!=null){
@@ -145,7 +145,7 @@ export default class DataManager {
 
     //-- Page Data --------------------------------------------//
 
-        async _fetch_database(){
+        async _fetch_page_database(){
             const resp = await window.fetch(this.API_URIS.PAGE_DB_FILE);
             const objects = await resp.json();
             objects.forEach(e=>this._process_node(e));
@@ -214,7 +214,7 @@ export default class DataManager {
     //-- Page Loading ------------------------------------------------------------------//
 
         async load_page_view(name,params){
-            if(!this._page_data_loaded){
+            if(!this._is_page_data_loaded){
                 this._page_data_loaded_state_hold = {name,params};
                 return;
             }

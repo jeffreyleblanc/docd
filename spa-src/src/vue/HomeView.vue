@@ -8,7 +8,7 @@ SPDX-License-Indentifier: MIT
         Hello from Home
     </h1>
     <div class="text-purple-300">
-        This is my documentation page
+        This is a documentation page
     </div>
 </article>
 </template>

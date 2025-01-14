@@ -106,7 +106,6 @@ export default {
 
     },
     methods: {
-        // pass
         open_all(){
             this.$M.toggle_all_directories(true);
         },
