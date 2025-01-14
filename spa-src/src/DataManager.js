@@ -11,11 +11,13 @@ export default class DataManager {
         // Access the global
         this.$G = G;
 
-        // Our API URLS
-        this.API_URLS = {
-            db_root: "/_resources",
-            search_index: "/_resources/search/serialized-index.json"
-        }
+        // Our API URI Library
+        const URIROOT = "/_resources";
+        this.API_URIS = {};
+        this.API_URIS.PAGE_DB_FILE =      `${URIROOT}/pages-database.json?h=${random_string()}`;
+        this.API_URIS.SEARCH_INDEX_FILE = `${URIROOT}/search/serialized-index.json?h=${random_string()}`;
+        this.API_URIS.PAGE_RENDERER_FILE = (PAGE_URI)=>`${URIROOT}/pages-html/${PAGE_URI}.html?h=${random_string()}`;
+        this.API_URIS.PAGE_RAW_FILE =      (PAGE_URI)=>`${URIROOT}/pages-txt/${PAGE_URI}.txt?h=${random_string()}`;
 
         // Reactive uistate
         this._uistate = reactive({
@@ -77,7 +79,7 @@ export default class DataManager {
         get uistate(){ return this._uistate; }
         get data(){ return this._data; }
 
-    //-- UI --------------------------------------------//
+    //-- UI ---------------------------------------------------//
 
         _setup_theme(){
             // https://tailwindcss.com/docs/responsive-design, matches `md:`
@@ -141,13 +143,11 @@ export default class DataManager {
             // We only clear state on reopening
         }
 
-    //-- Data --------------------------------------------//
+    //-- Page Data --------------------------------------------//
 
         async _fetch_database(){
-            const resp = await window.fetch(`${this.API_URLS.db_root}/pages-database.json?h=${random_string()}`);
-            console.log("DB resp:",resp);
+            const resp = await window.fetch(this.API_URIS.PAGE_DB_FILE);
             const objects = await resp.json();
-            console.log("DB objs:",objects)
             objects.forEach(e=>this._process_node(e));
         }
 
@@ -226,13 +226,11 @@ export default class DataManager {
 
                 // Find the page node and get the db_uri
                 const page_obj = this._data.nodes_by_uri.get(page_uri);
-                const db_uri = page_obj.db_uri;
-
                 this._data.current_node = page_obj;
 
                 // Fetch and set info
                 this._data.current_uri = page_uri;
-                const resp = await window.fetch(`${this.API_URLS.db_root}/pages-html/${db_uri}?h=${random_string()}`);
+                const resp = await window.fetch(this.API_URIS.PAGE_RENDERER_FILE(page_obj.uri));
                 const text = await resp.text();
                 this._data.current_html = text;
             }catch(err){
@@ -249,11 +247,9 @@ export default class DataManager {
 
         async load_raw_text(){
             // Fetch and set info
-            const raw_uri = `${this._data.current_node.uri}.txt`
-            const resp = await window.fetch(`${this.API_URLS.db_root}/pages-txt/${raw_uri}?h=${random_string()}`);
+            const resp = await window.fetch(this.API_URIS.PAGE_RAW_FILE(this._data.current_node.uri));
             const raw_text = await resp.text();
             this._data.current_raw_text = raw_text;
-            console.log("RAW TEXT=>",raw_text)
             this._uistate.article_view_mode = "raw";
         }
 
@@ -261,19 +257,17 @@ export default class DataManager {
 
         async load_search_system(){
             // could make a "search_available" uistate
-            const resp = await window.fetch(this.API_URLS.search_index);
+            const resp = await window.fetch(this.API_URIS.SEARCH_INDEX_FILE);
             const resp_obj = await resp.json();
             this.search_index = lunr.Index.load(resp_obj);
             this._is_search_index_loaded = true;
         }
 
         async trigger_search(search_text){
-            if(! this._is_search_index_loaded){
+            if(!this._is_search_index_loaded){
                 await this.load_search_system();
             }
-            console.log("run search on:",search_text)
             const results = this.search_index.search(search_text);
-            console.log("got:",results)
             this._data.has_search_result = true;
             this._data.search_results = Object.freeze(results);
         }
