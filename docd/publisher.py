@@ -23,7 +23,6 @@ class DocNode:
     uri: Path                       # this is the visible uri for the page. this functions as the primary key
     parent_uri: Path                # this is uri of the "parent" or null if none
     depth: int
-    db_uri: Path                    # this is the uri for the page source file in the database
     source_path: Path               # this is the relative filepath in the docs raw source
     display_name: str               # this is the name of the directory or file as displayed in the SPA
     display_suffix: str = None      # this is the suffix, if applicable, to be displayed in the SPA
@@ -35,7 +34,6 @@ class DocNode:
             "uri": str(self.uri),
             "parent_uri": None if self.parent_uri is None else str(self.parent_uri),
             "depth": self.depth,
-            "db_uri": str(self.db_uri),
             "source_path": str(self.source_path),
             "display_name": self.display_name,
             "display_suffix": self.display_suffix,
@@ -109,7 +107,7 @@ class Publisher:
 
             # Determine paths
             source = self.SOURCE_ROOT/info.source_path
-            dest = self.DEST_PAGES_HTML_DIR/info.db_uri
+            dest = self.DEST_PAGES_HTML_DIR/f"{info.uri}.html"
 
             # Ensure the folder exists
             dest.parent.mkdir(parents=True,exist_ok=True)
@@ -209,7 +207,6 @@ class Publisher:
             uri = directory_relpath,
             parent_uri = directory_parent_uri,
             depth = depth,
-            db_uri = directory_relpath,
             source_path = directory_relpath,
             display_name = directory_display_name,
             display_suffix = None,
@@ -242,9 +239,6 @@ class Publisher:
                 else:
                     _stem += f"--dot-{_suffix[1:]}"
 
-                # The database uri is always an html file
-                child_db_uri = relpath_parent/f"{_stem}.html"
-
                 # Display name exchanges '--' for ': '
                 child_display_name = child_relpath.stem.replace("--",": ")
 
@@ -257,7 +251,6 @@ class Publisher:
                     uri = relpath_parent/_stem,
                     parent_uri = child_relpath.parent,
                     depth = depth,
-                    db_uri = child_db_uri,
                     source_path = child_relpath,
                     display_name = child_display_name,
                     display_suffix = _suffix,
