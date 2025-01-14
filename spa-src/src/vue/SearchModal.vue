@@ -9,7 +9,7 @@ SPDX-License-Indentifier: MIT
             <div class="sq-4 mx-2">
                 <IconSearch/>
             </div>
-            <input ref="search_input" type="text" v-model="local_search_term"
+            <input ref="search_input" type="text" v-model.trim="local_search_term"
                 class="flex-1 p-2 bg-transparent border-0 focus:ring-0"
                 placeholder="Search documentation"
                 @keypress.enter="run_search"
@@ -64,7 +64,11 @@ export default {
     },
     methods: {
         run_search(){
-            this.$M.trigger_search(this.local_search_term);
+            // Note vue is trimming the input for us
+            const term = this.local_search_term;
+            if(term!=""){
+                this.$M.trigger_search(term);
+            }
         },
         close(){
             this.$M.close_search_modal();

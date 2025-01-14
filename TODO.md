@@ -4,8 +4,6 @@
 
 UI
 
-* [ ] Search system
-    * [ ] Use https://vuejs.org/guide/essentials/forms.html#trim and don't search whitespace
 * [ ] Cleanup the UI as needed
     * [ ] Article and rendered/raw
         * [ ] Also update DataManager parts
