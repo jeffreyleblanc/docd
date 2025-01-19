@@ -65,15 +65,15 @@ SPDX-License-Indentifier: MIT
 
         .full-size { @apply h-full w-full; }
 
-        .sq-2  { @apply w-2 h-2; }
-        .sq-3  { @apply w-3 h-3; }
-        .sq-4  { @apply w-4 h-4; }
-        .sq-5  { @apply w-5 h-5; }
-        .sq-6  { @apply w-6 h-6; }
-        .sq-7  { @apply w-7 h-7; }
-        .sq-8  { @apply w-8 h-8; }
-        .sq-9  { @apply w-9 h-9; }
-        .sq-10 { @apply w-10 h-10; }
+        .sq-2  { @apply w-2 h-2     min-w-2 min-h-2;    }
+        .sq-3  { @apply w-3 h-3     min-w-3 min-h-3;    }
+        .sq-4  { @apply w-4 h-4     min-w-4 min-h-4;    }
+        .sq-5  { @apply w-5 h-5     min-w-5 min-h-5;    }
+        .sq-6  { @apply w-6 h-6     min-w-6 min-h-6;    }
+        .sq-7  { @apply w-7 h-7     min-w-7 min-h-7;    }
+        .sq-8  { @apply w-8 h-8     min-w-8 min-h-8;    }
+        .sq-9  { @apply w-9 h-9     min-w-9 min-h-9;    }
+        .sq-10 { @apply w-10 h-10   min-w-10 min-h-10;  }
 
         .force-w-px { width: 1px; min-width: 1px; }
         .force-h-px { height: 1px; min-height: 1px; }

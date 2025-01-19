@@ -4,17 +4,17 @@ SPDX-FileCopyRightText: Copyright (c) 2023-present Jeffrey LeBlanc
 SPDX-License-Indentifier: MIT
 -->
 <div class="ui-child-expand ui-parent-stack">
-    <nav class="ui-child-center-x top-[4rem] w-1/2 h-1/2 ui-parent-col th-core-bg-surface2 th-core-text-base rounded-lg">
+    <nav class="ui-child-center-x top-4 md:top-16 w-[calc(100%-2rem)] md:w-1/2 h-[calc(100%-2rem)] md:h-1/2 ui-parent-col th-core-bg-surface2 th-core-text-base rounded-lg">
         <section class="ui-row items-center h-16 px-4 border-b th-core-border-soft">
-            <div class="sq-4 mx-2">
+            <div class="sq-4">
                 <IconSearch/>
             </div>
             <input ref="search_input" type="text" v-model.trim="local_search_term"
-                class="flex-1 p-2 bg-transparent border-0 focus:ring-0"
+                class="flex-1 bg-transparent border-0 focus:ring-0"
                 placeholder="Search documentation"
                 @keypress.enter="run_search"
             />
-            <div class="ui-row items-center p-2">
+            <div class="ui-row items-center">
                 <button @click="close" class="th-core-bg-muted rounded px-2">
                     esc
                 </button>
