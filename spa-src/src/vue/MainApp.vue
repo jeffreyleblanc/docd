@@ -14,8 +14,10 @@ SPDX-License-Indentifier: MIT
             <div v-if="error_open" class="py-2 px-4 bg-red-700 text-white">
                 {{error_msg}}
             </div>
-            <section ref="article_container" class="ui-child-expand ui-parent-col border border-green-400 ui-scroll-y">
+            <section ref="article_container" class="ui-child-expand ui-parent-col ui-scroll-y">
+                <div class="min-h-8 w-full"/>
                 <RouterView/>
+                <div class="min-h-16 w-full"/>
                 <ArticleFooter/>
             </section>
         </div>
