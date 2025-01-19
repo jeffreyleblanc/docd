@@ -23,7 +23,7 @@ SPDX-License-Indentifier: MIT
     </template>
     <template v-else>
         <pre
-            class="grow px-4 pt-8 pb-16 md:w-[48rem] md:self-center md:pt-12 md:pb-24 th-core-bg-surface1 overflow-x-auto"
+            class="grow px-4 pt-8 pb-16 md:w-[48rem] md:self-center md:pt-12 md:pb-24 th-core-bg-surface1 whitespace-pre-wrap"
             v-html="current_raw_text"
         />
     </template>
