@@ -100,7 +100,6 @@ if __name__ == "__main__":
     A("check", help="Check docs for filter phrases")
     A("info", help="Print info on the repo config")
 
-
     #-- Process args -----------------------------------------------------------#
 
     args = parser.parse_args()
@@ -119,39 +118,26 @@ if __name__ == "__main__":
     _here = Path(__file__).parent
     if _here == Path("/usr/local/bin"):
         ctx.IN_DOCD_SOURCE_REPO = False
-        ## ctx.SUPPORT_RESOURCES_DIRPATH = Path("/usr/local/lib/docd/support/")
     else:
         ctx.IN_DOCD_SOURCE_REPO = True
-        ## ctx.SUPPORT_RESOURCES_DIRPATH = _here/"support/"
-    ## assert ctx.SUPPORT_RESOURCES_DIRPATH.is_dir()
-
-    # # Determine the doc repo paths
-    # _repo = Path(args.repo_directory) if args.repo_directory is not None else Path.cwd()
-    # ctx.DOCS_REPO_DIRPATH = _repo
-    # assert ctx.DOCS_REPO_DIRPATH.is_dir()
-    # ctx.DOCS_CONFIG_FILEPATH = _repo/"docd.toml"
-    # assert ctx.DOCS_CONFIG_FILEPATH.is_file()
-    # ctx.DOCS_DOCS_DIRPATH = _repo/"docs/"
-    # assert ctx.DOCS_DOCS_DIRPATH.is_dir()
-    # ctx.DOCS_DIST_DIRPATH = _repo/"_dist/"
-
-    # # Load the config
-    # config = load_config(ctx.DOCS_CONFIG_FILEPATH)
 
     #-- Execute the Commands -----------------------------------------------------------#
 
     if "make-spa-framework" == args.main_command:
-        print("make-spa-framework")
-
+        # Determine paths
         SPA_SRC_DIR = Path("spa-src")
         SPA_SRC_STATIC_DIR = SPA_SRC_DIR/"dist/static"
         SPA_SRC_SPA_TEMPLATE_FILE = SPA_SRC_DIR/"html-templates/spa.html"
 
+        # Build the js/css with vite
         print("Building the js/css with vite:")
         c,o,e = proc("npx vite build",cwd=SPA_SRC_DIR)
         print(c,o,e)
 
+        # Set the spa-dist directory
         SPA_DIST_DIR = Path("spa-dist/dist")
+
+        # Build and clear the spa-dist static directory
         SPA_DIST_STATIC_DIR = SPA_DIST_DIR/"static"
         SPA_DIST_STATIC_DIR.mkdir(exist_ok=True,parents=True)
         for fp in SPA_DIST_STATIC_DIR.iterdir():
@@ -160,14 +146,14 @@ if __name__ == "__main__":
             else:
                 fp.unlink()
 
-        # This is is duplicated in devserver, so move to common place
-        # Find the paths
+        # Determine the js/css paths
+        """
+        !! This is is duplicated in devserver, so move to common place
+        """
         js_file = [ e for e in SPA_SRC_STATIC_DIR.glob("*.js") ][0]
         css_file = [ e for e in SPA_SRC_STATIC_DIR.glob("*.css") ][0]
 
-        print("js_file",js_file)
-        print("css_file",css_file)
-
+        # Copy the paths to spa-dist
         shutil.copy(js_file,SPA_DIST_STATIC_DIR/js_file.name)
         shutil.copy(css_file,SPA_DIST_STATIC_DIR/css_file.name)
 
@@ -175,8 +161,7 @@ if __name__ == "__main__":
         with SPA_SRC_SPA_TEMPLATE_FILE.open("r") as fp:
             SPA_TEMPLATE = fp.read()
 
-        # Make a temporary config for now
-        # Leave off the css and js as those will be dynamically added
+        # Build out the config against the files
         SPA_CONFIG = {
             # "__TITLE__":    "Temp TITLE",
             # "__AUTHOR__":   "Alice and Bob",
@@ -188,12 +173,9 @@ if __name__ == "__main__":
         }
         for k,v in SPA_CONFIG.items():
             SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
-
         SPA_DIST_SPA_FILE = SPA_DIST_DIR/"index.html"
         with SPA_DIST_SPA_FILE.open("w") as fp:
             fp.write(SPA_TEMPLATE)
-
-
 
     else:
         # Determine the doc repo paths
@@ -209,6 +191,7 @@ if __name__ == "__main__":
         # Load the config
         config = load_config(ctx.DOCS_CONFIG_FILEPATH)
 
+        # Execute the command
         match args.main_command:
 
             case "clean-dist":
