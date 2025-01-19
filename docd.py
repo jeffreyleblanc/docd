@@ -166,7 +166,7 @@ if __name__ == "__main__":
             from docd.devserver import DocdDevServer
 
             # Load the new spa page template
-            SPA_TEMPLATE_PATH = Path("support/templates/spa.html")
+            SPA_TEMPLATE_PATH = Path("spa-src/html-templates/spa.html")
             with SPA_TEMPLATE_PATH.open("r") as fp:
                 SPA_TEMPLATE = fp.read()
 
