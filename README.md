@@ -55,7 +55,7 @@ On a Debian/Ubuntu System:
 
 ```sh
 # Install dependencies
-sudo apt-get install make rsync python3-mistune python3-pygments python3-toml ripgrep
+sudo apt-get install make rsync python3-markdown python3-toml
 # Install
 make install 
 ```
@@ -64,7 +64,7 @@ To full build from source:
 
 ```sh
 # Install dependencies
-sudo apt-get install make rsync python3-mistune python3-pygments python3-tomlripgrep
+sudo apt-get install make rsync python3-markdown python3-toml
 sudo apt-get install nodejs npm 
 # Setup and build web
 make setup-web
@@ -81,10 +81,8 @@ The following dependencies are required (assuming on Debian/Ubuntu):
 ```sh
 sudo apt-get install \
     make rsync \
-    python3-mistune python3-pygments python3-toml \
+    python3-markdown python3-toml \
     nodejs npm
-# The `check` method uses ripgrep
-sudo apt-get install ripgrep
 ```
 
 There are 2 Makefiles, one in the project root and one in `spa-src/`.
@@ -186,14 +184,3 @@ options:
                         Root document repo directory. Defaults to cwd.
 ```
 
-
-## Development Patterns
-
-```sh
-# Build the spa js/css
-$ ./docd-local.py build-web
-
-# Rebuild the spa or the entire site running from repo
-$ ./docd.py -R PATH_TO_DOCS_REPO spa
-$ ./docd.py -R PATH_TO_DOCS_REPO build
-```
