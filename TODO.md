@@ -4,16 +4,6 @@
 
 UI
 
-* [ ] Article
-    * [ ] Better position for the last modified part
-    * [ ] Better ui/position for the rendered/raw choice
-    * [ ] Make the raw view better formatted
-        * [ ] wrap the pre lines
-        * [ ] no scroll within the pre, have it outside on main element
-    * [ ] Give more spacing before the copyright text for:
-        * [ ] rendered
-        * [ ] raw
-    * [ ] Check all of the above looks ok on mobile too
 * [ ] Mobile
     * [ ] Add quick search to the mobile bar
     * [ ] Size/position the search modal better in mobile
