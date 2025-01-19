@@ -2,22 +2,42 @@
 
 **SPRINT**
 
+Build System
+
+* [ ] Initial code DRY
+    * [ ] Make the finding source paths a common method
+        * [ ] Add error handling
+    * [ ] Make emptying a directory, a common method
+    * [ ] Make the spa template handling a common method
+* [ ] `spa-dist/` => `spa-framework-dist/`
+* [ ] `make-spa-framework` => `developer build-spa-framework`
+* [ ] Make a `developer clear-spa-framework`
+* [ ] Make a `build-spa` command which will take `spa-dist` and actually put the proper stuff in `DOCS/_dist`
+    * [ ] Have it confirm the `spa-dist` isn't empty
+* [ ] Enable a uri_base path option, that sets things in the spa template and works with the devserver
+* [ ] Make a `build-all` command
+* [ ] Make the `push` command work again
+    * [ ] Test
+    * [ ] Show the caddy fragment needed
+* Evaluate what else needs to be done...
+    * probably cleaning up usage of DocdRunContext if haven't had to already
+    * handle as installed vs not... or save for a next sprint
+    * clean up devserver a little, or move some logic out of docd.py
+    * etc...
+
 UI
 
 * [ ] Make the "home" view use the actual index.md/html
+    * [ ] Make a fallback if it's not there
 
 Markdown
 
 * [ ] Update the markdown
     * Don't try to guess syntax 
 
-Build System
-
-* [ ] Add back in the export spa/js/css for deployment
-    * [ ] be able to run devserver serving the spa and static from `_dist`
-
 Close Out and Deploy
 
+* [ ] Update the dependencies notes
 * [ ] Version the search index
 * [ ] Enable hosting sites to work with new output using caddy
 * [ ] Push as a test
