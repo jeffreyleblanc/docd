@@ -6,6 +6,7 @@
 import argparse
 from pathlib import Path
 from dataclasses import dataclass
+import shutil
 import toml
 import json
 from docd.utils.proc import proc
@@ -88,6 +89,7 @@ if __name__ == "__main__":
     A = subparsers.add_parser
 
     # Main commands
+    A("make-spa-framework", help="Build a distributable version of the spa files")
     A("clean-dist", help="Clean out the docd site")
     A("build-pages", help="Build the rendered pages")
     A("build-search", help="Build the search index")
@@ -117,94 +119,165 @@ if __name__ == "__main__":
     _here = Path(__file__).parent
     if _here == Path("/usr/local/bin"):
         ctx.IN_DOCD_SOURCE_REPO = False
-        ctx.SUPPORT_RESOURCES_DIRPATH = Path("/usr/local/lib/docd/support/")
+        ## ctx.SUPPORT_RESOURCES_DIRPATH = Path("/usr/local/lib/docd/support/")
     else:
         ctx.IN_DOCD_SOURCE_REPO = True
-        ctx.SUPPORT_RESOURCES_DIRPATH = _here/"support/"
-    assert ctx.SUPPORT_RESOURCES_DIRPATH.is_dir()
+        ## ctx.SUPPORT_RESOURCES_DIRPATH = _here/"support/"
+    ## assert ctx.SUPPORT_RESOURCES_DIRPATH.is_dir()
 
-    # Determine the doc repo paths
-    _repo = Path(args.repo_directory) if args.repo_directory is not None else Path.cwd()
-    ctx.DOCS_REPO_DIRPATH = _repo
-    assert ctx.DOCS_REPO_DIRPATH.is_dir()
-    ctx.DOCS_CONFIG_FILEPATH = _repo/"docd.toml"
-    assert ctx.DOCS_CONFIG_FILEPATH.is_file()
-    ctx.DOCS_DOCS_DIRPATH = _repo/"docs/"
-    assert ctx.DOCS_DOCS_DIRPATH.is_dir()
-    ctx.DOCS_DIST_DIRPATH = _repo/"_dist/"
+    # # Determine the doc repo paths
+    # _repo = Path(args.repo_directory) if args.repo_directory is not None else Path.cwd()
+    # ctx.DOCS_REPO_DIRPATH = _repo
+    # assert ctx.DOCS_REPO_DIRPATH.is_dir()
+    # ctx.DOCS_CONFIG_FILEPATH = _repo/"docd.toml"
+    # assert ctx.DOCS_CONFIG_FILEPATH.is_file()
+    # ctx.DOCS_DOCS_DIRPATH = _repo/"docs/"
+    # assert ctx.DOCS_DOCS_DIRPATH.is_dir()
+    # ctx.DOCS_DIST_DIRPATH = _repo/"_dist/"
 
-    # Load the config
-    config = load_config(ctx.DOCS_CONFIG_FILEPATH)
+    # # Load the config
+    # config = load_config(ctx.DOCS_CONFIG_FILEPATH)
 
     #-- Execute the Commands -----------------------------------------------------------#
 
-    match args.main_command:
+    if "make-spa-framework" == args.main_command:
+        print("make-spa-framework")
 
-        case "clean-dist":
-            import shutil
-            assert ctx.DOCS_DIST_DIRPATH.is_dir()
-            for fp in ctx.DOCS_DIST_DIRPATH.iterdir():
-                if fp.is_dir():
-                    shutil.rmtree(fp)
-                else:
-                    fp.unlink()
+        SPA_SRC_DIR = Path("spa-src")
+        SPA_SRC_STATIC_DIR = SPA_SRC_DIR/"dist/static"
+        SPA_SRC_SPA_TEMPLATE_FILE = SPA_SRC_DIR/"html-templates/spa.html"
 
-        case "build-pages":
-            from docd.publisher import Publisher
-            pub = Publisher(ctx,config)
-            pub.build_dest_directory_structure()
-            pub.build_docs()
+        print("Building the js/css with vite:")
+        c,o,e = proc("npx vite build",cwd=SPA_SRC_DIR)
+        print(c,o,e)
 
-        case "build-search":
-            from docd.publisher import Publisher
-            pub = Publisher(ctx,config)
-            pub.build_dest_directory_structure()
-            pub.build_search_index()
+        SPA_DIST_DIR = Path("spa-dist/dist")
+        SPA_DIST_STATIC_DIR = SPA_DIST_DIR/"static"
+        SPA_DIST_STATIC_DIR.mkdir(exist_ok=True,parents=True)
+        for fp in SPA_DIST_STATIC_DIR.iterdir():
+            if fp.is_dir():
+                shutil.rmtree(fp)
+            else:
+                fp.unlink()
 
-        case "devserver":
-            import asyncio
-            from docd.devserver import DocdDevServer
+        # This is is duplicated in devserver, so move to common place
+        # Find the paths
+        js_file = [ e for e in SPA_SRC_STATIC_DIR.glob("*.js") ][0]
+        css_file = [ e for e in SPA_SRC_STATIC_DIR.glob("*.css") ][0]
 
-            # Load the new spa page template
-            SPA_TEMPLATE_PATH = Path("spa-src/html-templates/spa.html")
-            with SPA_TEMPLATE_PATH.open("r") as fp:
-                SPA_TEMPLATE = fp.read()
+        print("js_file",js_file)
+        print("css_file",css_file)
 
-            # Make a temporary config for now
-            # Leave off the css and js as those will be dynamically added
-            SPA_CONFIG = {
-                "__TITLE__":    "Temp TITLE",
-                "__AUTHOR__":   "Alice and Bob",
-                "__NAME__" :    "Sample Docs",
-                "__FOOTER__":   "Copyright Me",
-                "__HOME_URL__": "/",
-                # "__CSS_FILE__": "/static/main.css",
-                # "__JS_FILE__":  "/static/main.js"
-            }
-            for k,v in SPA_CONFIG.items():
-                SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
+        shutil.copy(js_file,SPA_DIST_STATIC_DIR/js_file.name)
+        shutil.copy(css_file,SPA_DIST_STATIC_DIR/css_file.name)
 
-            # Set the static directory as where vite builds to
-            STATIC_DIR = Path("spa-src/dist/static")
+        # Load the spa page template
+        with SPA_SRC_SPA_TEMPLATE_FILE.open("r") as fp:
+            SPA_TEMPLATE = fp.read()
 
-            # Set the file paths
-            FILE_PATHS = dict(
-                _resources =     ctx.DOCS_DIST_DIRPATH/"_resources",
-                static = STATIC_DIR
-            )
+        # Make a temporary config for now
+        # Leave off the css and js as those will be dynamically added
+        SPA_CONFIG = {
+            # "__TITLE__":    "Temp TITLE",
+            # "__AUTHOR__":   "Alice and Bob",
+            # "__NAME__" :    "Sample Docs",
+            # "__FOOTER__":   "Copyright Me",
+            # "__HOME_URL__": "/",
+            "__CSS_FILE__": f"/static/{css_file.name}",
+            "__JS_FILE__":  f"/static/{js_file.name}"
+        }
+        for k,v in SPA_CONFIG.items():
+            SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
 
-            async def run_server():
-                PORT = 8100
-                ADDRESS = "localhost"
-                server = DocdDevServer(SPA_TEMPLATE,FILE_PATHS)
-                server.listen(PORT,address=ADDRESS)
-                print(f"Running at {ADDRESS}:{PORT}")
-                await asyncio.Event().wait()
+        SPA_DIST_SPA_FILE = SPA_DIST_DIR/"index.html"
+        with SPA_DIST_SPA_FILE.open("w") as fp:
+            fp.write(SPA_TEMPLATE)
 
-            asyncio.run(run_server())
+
+
+    else:
+        # Determine the doc repo paths
+        _repo = Path(args.repo_directory) if args.repo_directory is not None else Path.cwd()
+        ctx.DOCS_REPO_DIRPATH = _repo
+        assert ctx.DOCS_REPO_DIRPATH.is_dir()
+        ctx.DOCS_CONFIG_FILEPATH = _repo/"docd.toml"
+        assert ctx.DOCS_CONFIG_FILEPATH.is_file()
+        ctx.DOCS_DOCS_DIRPATH = _repo/"docs/"
+        assert ctx.DOCS_DOCS_DIRPATH.is_dir()
+        ctx.DOCS_DIST_DIRPATH = _repo/"_dist/"
+
+        # Load the config
+        config = load_config(ctx.DOCS_CONFIG_FILEPATH)
+
+        match args.main_command:
+
+            case "clean-dist":
+                import shutil
+                assert ctx.DOCS_DIST_DIRPATH.is_dir()
+                for fp in ctx.DOCS_DIST_DIRPATH.iterdir():
+                    if fp.is_dir():
+                        shutil.rmtree(fp)
+                    else:
+                        fp.unlink()
+
+            case "build-pages":
+                from docd.publisher import Publisher
+                pub = Publisher(ctx,config)
+                pub.build_dest_directory_structure()
+                pub.build_docs()
+
+            case "build-search":
+                from docd.publisher import Publisher
+                pub = Publisher(ctx,config)
+                pub.build_dest_directory_structure()
+                pub.build_search_index()
+
+
+            case "devserver":
+                import asyncio
+                from docd.devserver import DocdDevServer
+
+                # Load the new spa page template
+                SPA_TEMPLATE_PATH = Path("spa-src/html-templates/spa.html")
+                with SPA_TEMPLATE_PATH.open("r") as fp:
+                    SPA_TEMPLATE = fp.read()
+
+                # Make a temporary config for now
+                # Leave off the css and js as those will be dynamically added
+                SPA_CONFIG = {
+                    "__TITLE__":    "Temp TITLE",
+                    "__AUTHOR__":   "Alice and Bob",
+                    "__NAME__" :    "Sample Docs",
+                    "__FOOTER__":   "Copyright Me",
+                    "__HOME_URL__": "/",
+                    # "__CSS_FILE__": "/static/main.css",
+                    # "__JS_FILE__":  "/static/main.js"
+                }
+                for k,v in SPA_CONFIG.items():
+                    SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
+
+                # Set the static directory as where vite builds to
+                STATIC_DIR = Path("spa-src/dist/static")
+
+                # Set the file paths
+                FILE_PATHS = dict(
+                    _resources =     ctx.DOCS_DIST_DIRPATH/"_resources",
+                    static = STATIC_DIR
+                )
+
+                async def run_server():
+                    PORT = 8100
+                    ADDRESS = "localhost"
+                    server = DocdDevServer(SPA_TEMPLATE,FILE_PATHS)
+                    server.listen(PORT,address=ADDRESS)
+                    print(f"Running at {ADDRESS}:{PORT}")
+                    await asyncio.Event().wait()
+
+                asyncio.run(run_server())
 
         ## Older #################################################
 
+        """
         case "info":
             import pprint
             pp = pprint.PrettyPrinter(indent=4)
@@ -247,4 +320,4 @@ if __name__ == "__main__":
 
         case _:
             print("ERROR: Failed to find command `{args.main_command}`")
-
+        """
