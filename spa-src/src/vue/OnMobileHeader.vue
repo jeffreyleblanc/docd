@@ -7,21 +7,30 @@ SPDX-License-Indentifier: MIT
     <button class="sq-6" @click="show_nav=true">
         <IconList/>
     </button>
+    <button class="sq-5" @click="open_search_modal">
+        <IconSearch/>
+    </button>
     <h1 class="text-xl font-bold">{{name}}</h1>
 </header>
 </template>
 
 <script>
 import IconList from "./icons/IconList.vue"
+import IconSearch from "./icons/IconSearch.vue"
 
 export default {
     data(){ return {} },
-    components: { IconList },
+    components: { IconList, IconSearch },
     computed: {
         name(){ return this.$M.data.name },
         show_nav: {
             get(){ return this.$M.uistate.show_nav; },
             set(val){ this.$M.uistate.show_nav = val; }
+        }
+    },
+    methods: {
+        open_search_modal(){
+            this.$M.open_search_modal();
         }
     }
 }
