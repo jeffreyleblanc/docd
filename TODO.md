@@ -4,9 +4,6 @@
 
 UI
 
-* [ ] Mobile
-    * [ ] Add quick search to the mobile bar
-    * [ ] Size/position the search modal better in mobile
 * [ ] Make the "home" view use the actual index.md/html
 
 Markdown

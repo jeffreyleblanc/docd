@@ -1,37 +1,52 @@
 # Docd Overview
 
-## Development Usage
-
-```sh
-# In one pane:
-$ cd spa-src
-$ npx vite build --watch
-
-# In another:
-$ ./docd.py -R PATH_TO_DOCS_REPO newserver
-```
-
-```sh
-_dist/
-    index.html # spa
-    _resources
-        pages-database.json
-        pages-html/
-            ... all the pages
-        media/
-            ... media support
-        search/
-            ... search tooling
-        static/
-            ... static tooling
-```
-
-
-## About and Motivation
+## 1. About and Motivation
 
 `docd` is a tool for building documentation from markdown and other source files.
 
 It's designed to roughly mimic `mkdocs`, but have more flexbility.
+
+
+## 2. Development Setup
+
+Use a setup like this for easy dev:
+
+```sh
+# Pane for css/js building
+$ cd spa-src
+$ npx vite build --watch
+
+# Pane for building pages/search
+$ ./docd.py -R PATH_TO_DOCS_REPO build-pages
+$ ./docd.py -R PATH_TO_DOCS_REPO build-search
+
+# Pane to run the devserver
+$ ./docd.py -R PATH_TO_DOCS_REPO devserver
+```
+
+
+## 3. Structure of the Output
+
+```sh
+main_docs_repo/
+    _dist/
+        index.html # SPA html page (May not be present in dev mode)
+        _resources
+            pages-database.json
+            media/
+                ... media support
+            pages-html/
+                ... all the pages as rendered htm
+            pages-txt/
+                ... all the pages as raw text
+            search/
+                ... search index files
+            static/
+                ... static css/js SPA files # (May not be present in dev mode)
+```
+
+
+# -- OLDER -------------------------------------------------------------------------------- #
 
 
 ## Setup and Installation TLDR
