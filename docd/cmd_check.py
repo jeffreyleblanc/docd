@@ -10,20 +10,18 @@ from pathlib import Path
 # Things
 import toml
 # Local
-from docd.utils .proc import proc
+from docd.utils.proc import proc
 
 def main_run(ctx, config):
     run_check(ctx.DOCS_DOCS_DIRPATH, config)
 
 def run_check(ROOT_DIR, config):
-    PHRASES = list(filter(len,config["filter_phrases"].splitlines()))
+    PHRASES = list(filter(len,config.check.filter_phrases.splitlines()))
 
     # Review the files
     no_matches = []
     for phrase in PHRASES:
-        # -i => --ignore-case
-        # -l => --file-with-matches
-        c,o,e = proc(f"rg {phrase} {ROOT_DIR} -i -l --color never")
+        c,o,e = proc(f"grep --color=never -i -l -r -n {phrase} {ROOT_DIR}")
         if c == 1:
             no_matches.append(phrase)
         elif c == 0:

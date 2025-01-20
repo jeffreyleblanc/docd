@@ -104,7 +104,9 @@ def main():
     A("build-pages", help="Build the rendered pages")
     A("build-search", help="Build the search index")
     A("build-spa", help="Build the dist spa")
-    # Devserver
+
+    # Tools and Devserver
+    A("check", help="Check docs for filter phrases")
     a = A("devserver", help="Run the new server")
     a.add_argument("--port",default=8100)
     a.add_argument("--address",default="localhost")
@@ -114,7 +116,6 @@ def main():
 
     # Older
     A("push", help="Push docs to a remote")
-    A("check", help="Check docs for filter phrases")
     A("info", help="Print info on the repo config")
 
     #-- Process args -----------------------------------------------------------#
@@ -289,6 +290,10 @@ def main():
                     await asyncio.Event().wait()
 
                 asyncio.run(run_server())
+
+            case "check":
+                import docd.cmd_check as CHECK
+                CHECK.main_run(ctx,config)
 
         ## Older #################################################
 
