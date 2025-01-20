@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import shutil
 import toml
 import json
-from docd.utils.proc import proc, rsync
+from docd.utils.proc import proc, local_rsync
 from docd.utils.obj import DictObj
 from docd.utils.filetools import clear_directory, find_one_matching_file
 from docd.spa import render_spa_html
@@ -209,12 +209,8 @@ def main():
                 pub.build_search_index()
 
             case "build-spa":
-                # Define paths
-                SPA_DIST_DIR = Path("spa-framework-dist/dist")
-                SPA_DIST_STATIC_DIR = SPA_DIST_DIR/"static"
-
                 # Load the static info
-                static_info = json.loads((SPA_DIST_DIR/"static-resources.json").read_text())
+                static_info = json.loads(SPA_FRAMEWORK_DIST_RESOURCES_JSON_FILE.read_text())
 
                 # Make the spa html
                 spa_html = render_spa_html({
@@ -229,14 +225,14 @@ def main():
                 })
 
                 # Write it to file
-                DIST_SPA_FILE = ctx.DOCS_DIST_DIRPATH/"index.html"
-                with DIST_SPA_FILE.open("w") as f:
+                _DIST_SPA_FILE = ctx.DOCS_DIST_DIRPATH/"index.html"
+                with _DIST_SPA_FILE.open("w") as f:
                     f.write(spa_html)
 
                 # Sync over the static assets
-                STATIC_DIR = ctx.DOCS_DIST_DIRPATH/"_resources/static"
-                STATIC_DIR.mkdir(exist_ok=True)
-                rsync(SPA_DIST_STATIC_DIR,STATIC_DIR,delete=True)
+                _STATIC_DIR = ctx.DOCS_DIST_DIRPATH/"_resources/static"
+                _STATIC_DIR.mkdir(exist_ok=True,parents=True)
+                local_rsync(SPA_FRAMEWORK_DIST_STATIC_DIR,_STATIC_DIR,delete=True)
 
             case "devserver":
                 import asyncio
@@ -294,7 +290,7 @@ def main():
             CHECK.main_run(ctx,config)
 
         case "push":
-            #==> use the rsync tool from utils.proc
+            #==> use the local_rsync tool from utils.proc
 
             # Pull out info
             remote = config.remote
@@ -316,8 +312,8 @@ def main():
             assert src.endswith("/.") and not src.endswith("//.")
             assert dst.endswith("/.") and not dst.endswith("//.")
 
-            # Make the rsync command
-            cmd = f"rsync -avz --delete {src} {user}@{addr}:{dst}"
+            # Make the local_rsync command
+            cmd = f"local_rsync -avz --delete {src} {user}@{addr}:{dst}"
             c,o,e = proc(cmd)
             print(c,o,e)
 

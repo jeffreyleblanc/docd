@@ -12,7 +12,7 @@ import shutil
 from lunr import lunr
 # Local
 from docd.utils.markdown2html import make_html
-from docd.utils.proc import rsync
+from docd.utils.proc import local_rsync
 
 
 SKIP_DIRECTORIES = (".git","_output","_media")
@@ -89,7 +89,7 @@ class Publisher:
         # Synchronize the media folder
         media_src = self.SOURCE_ROOT/"_media"
         if media_src.is_dir():
-            c,o,e = rsync(media_src,self.DEST_MEDIA_DIR,delete=True)
+            c,o,e = local_rsync(media_src,self.DEST_MEDIA_DIR,delete=True)
             if c != 0:
                 print(c,o,e)
                 raise Exception("Rsync of _media failed")

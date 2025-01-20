@@ -16,7 +16,7 @@ def proc(cmd, cwd=None):
     )
 
 # We can improve this in future
-def rsync(src_dir, dst_dir, delete=False, exclude=[], follow_symlinks=False):
+def local_rsync(src_dir, dst_dir, delete=False, exclude=[], follow_symlinks=False):
     src = f"{Path(src_dir)}/."
     dst = f"{Path(dst_dir)}/."
     assert src.endswith("/.") and not src.endswith("//.")
