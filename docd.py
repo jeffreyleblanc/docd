@@ -25,7 +25,6 @@ class DocdRunContext:
     DOCS_DOCS_DIRPATH: Path = None
     DOCS_DIST_DIRPATH: Path = None
 
-DEFAULT_PORT = 8001
 
 def load_config(config_fpath):
     # Load the config
@@ -84,7 +83,7 @@ def load_config(config_fpath):
     return config
 
 
-if __name__ == "__main__":
+def main():
     __VERSION__ = "0.0.4"
 
     #-- Make the argparser -----------------------------------------------------------#
@@ -127,23 +126,28 @@ if __name__ == "__main__":
 
     # Determine if we are operating locally or from installed version,
     # and then set support paths accordingly
-    _here = Path(__file__).parent
-    if _here == Path("/usr/local/bin"):
+    HERE = Path(__file__).parent
+    if HERE == Path("/usr/local/bin"):
         ctx.IN_DOCD_SOURCE_REPO = False
     else:
         ctx.IN_DOCD_SOURCE_REPO = True
 
+    #-- Common Paths -------------------------------------------------------------------#
+
+    # spa-src/ paths
+    SPA_SRC_DIR = Path("spa-src").resolve()
+    SPA_SRC_STATIC_DIST_STATIC_DIR = SPA_SRC_DIR/"dist/static"
+    # spa-framework-dist/ paths
+    SPA_FRAMEWORK_DIST_DIR = Path("spa-framework-dist/dist").resolve()
+    SPA_FRAMEWORK_DIST_STATIC_DIR = SPA_FRAMEWORK_DIST_DIR/"static"
+    SPA_FRAMEWORK_DIST_RESOURCES_JSON_FILE = SPA_FRAMEWORK_DIST_DIR/"static-resources.json"
+
     #-- Execute the Commands -----------------------------------------------------------#
 
     if "developer" == args.main_command:
-        # Determine paths
-        SPA_SRC_DIR = Path("spa-src")
-        SPA_SRC_STATIC_DIR = SPA_SRC_DIR/"dist/static"
-        SPA_DIST_DIR = Path("spa-framework-dist/dist")
-
         if "clear-spa-framework" == args.devcmd:
-            if SPA_DIST_DIR.is_dir():
-                clear_directory(SPA_DIST_DIR)
+            if SPA_FRAMEWORK_DIST_DIR.is_dir():
+                clear_directory(SPA_FRAMEWORK_DIST_DIR)
 
         elif "build-spa-framework" == args.devcmd:
             # Build the js/css with vite
@@ -151,24 +155,20 @@ if __name__ == "__main__":
             c,o,e = proc("npx vite build",cwd=SPA_SRC_DIR)
             print(c,o,e)
 
-            # Set the spa-dist directory
-            SPA_DIST_DIR = Path("spa-framework-dist/dist")
-
             # Build and clear the spa-dist static directory
-            SPA_DIST_STATIC_DIR = SPA_DIST_DIR/"static"
-            SPA_DIST_STATIC_DIR.mkdir(exist_ok=True,parents=True)
-            clear_directory(SPA_DIST_STATIC_DIR)
+            SPA_FRAMEWORK_DIST_STATIC_DIR.mkdir(exist_ok=True,parents=True)
+            clear_directory(SPA_FRAMEWORK_DIST_STATIC_DIR)
 
             # Determine the js/css paths
-            JS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIR,"*.js")
-            CSS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIR,"*.css")
+            JS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIST_STATIC_DIR,"*.js")
+            CSS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIST_STATIC_DIR,"*.css")
 
             # Copy the paths to spa-dist
-            shutil.copy(JS_FILE,SPA_DIST_STATIC_DIR/JS_FILE.name)
-            shutil.copy(CSS_FILE,SPA_DIST_STATIC_DIR/CSS_FILE.name)
+            shutil.copy(JS_FILE,SPA_FRAMEWORK_DIST_STATIC_DIR/JS_FILE.name)
+            shutil.copy(CSS_FILE,SPA_FRAMEWORK_DIST_STATIC_DIR/CSS_FILE.name)
 
             # Write out the static resource names
-            with (SPA_DIST_DIR/"static-resources.json").open("w") as fp:
+            with SPA_FRAMEWORK_DIST_RESOURCES_JSON_FILE.open("w") as fp:
                 fp.write(json.dumps({
                     "js_file_name": JS_FILE.name,
                     "css_file_name": CSS_FILE.name
@@ -193,7 +193,6 @@ if __name__ == "__main__":
         match args.main_command:
 
             case "clean-dist":
-                import shutil
                 assert ctx.DOCS_DIST_DIRPATH.is_dir()
                 clear_directory(ctx.DOCS_DIST_DIRPATH)
 
@@ -325,3 +324,6 @@ if __name__ == "__main__":
         case _:
             print("ERROR: Failed to find command `{args.main_command}`")
         """
+
+if __name__ == "__main__":
+    main()
