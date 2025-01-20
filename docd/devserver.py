@@ -10,15 +10,14 @@ import json
 import asyncio
 import tornado
 # Local
+from docd.spa import render_spa_html
 from docd.utils.filetools import find_one_matching_file
 
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self, path):
         pkg = self.application.fetch_static_paths()
-        html = self.application.SPA_TEMPLATE
-        for k,v in pkg.items():
-            html = html.replace(k,v)
+        html = render_spa_html(pkg,template_text=self.application.SPA_TEMPLATE)
         self.write(html)
 
 

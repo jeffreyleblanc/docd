@@ -12,6 +12,8 @@ import json
 from docd.utils.proc import proc
 from docd.utils.obj import DictObj
 from docd.utils.filetools import clear_directory, find_one_matching_file
+from docd.spa import render_spa_html
+
 
 @dataclass
 class DocdRunContext:
@@ -128,7 +130,6 @@ if __name__ == "__main__":
         # Determine paths
         SPA_SRC_DIR = Path("spa-src")
         SPA_SRC_STATIC_DIR = SPA_SRC_DIR/"dist/static"
-        SPA_SRC_SPA_TEMPLATE_FILE = SPA_SRC_DIR/"html-templates/spa.html"
 
         # Build the js/css with vite
         print("Building the js/css with vite:")
@@ -151,25 +152,13 @@ if __name__ == "__main__":
         shutil.copy(JS_FILE,SPA_DIST_STATIC_DIR/JS_FILE.name)
         shutil.copy(CSS_FILE,SPA_DIST_STATIC_DIR/CSS_FILE.name)
 
-        # Load the spa page template
-        with SPA_SRC_SPA_TEMPLATE_FILE.open("r") as fp:
-            SPA_TEMPLATE = fp.read()
-
         # Build out the config against the files
-        SPA_CONFIG = {
-            # "__TITLE__":    "Temp TITLE",
-            # "__AUTHOR__":   "Alice and Bob",
-            # "__NAME__" :    "Sample Docs",
-            # "__FOOTER__":   "Copyright Me",
-            # "__HOME_URL__": "/",
+        rendered_spa_html = render_spa_html({
             "__CSS_FILE__": f"/static/{CSS_FILE.name}",
             "__JS_FILE__":  f"/static/{JS_FILE.name}"
-        }
-        for k,v in SPA_CONFIG.items():
-            SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
-        SPA_DIST_SPA_FILE = SPA_DIST_DIR/"index.html"
-        with SPA_DIST_SPA_FILE.open("w") as fp:
-            fp.write(SPA_TEMPLATE)
+        })
+        with (SPA_DIST_DIR/"index.html").open("w") as fp:
+            fp.write(rendered_spa_html)
 
     else:
         # Determine the doc repo paths
@@ -210,11 +199,6 @@ if __name__ == "__main__":
                 import asyncio
                 from docd.devserver import DocdDevServer
 
-                # Load the new spa page template
-                SPA_TEMPLATE_PATH = Path("spa-src/html-templates/spa.html")
-                with SPA_TEMPLATE_PATH.open("r") as fp:
-                    SPA_TEMPLATE = fp.read()
-
                 # Make a temporary config for now
                 # Leave off the css and js as those will be dynamically added
                 SPA_CONFIG = {
@@ -222,26 +206,23 @@ if __name__ == "__main__":
                     "__AUTHOR__":   "Alice and Bob",
                     "__NAME__" :    "Sample Docs",
                     "__FOOTER__":   "Copyright Me",
-                    "__HOME_URL__": "/",
-                    # "__CSS_FILE__": "/static/main.css",
-                    # "__JS_FILE__":  "/static/main.js"
+                    "__HOME_URL__": "/"
                 }
-                for k,v in SPA_CONFIG.items():
-                    SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
+                rendered_spa_html = render_spa_html(SPA_CONFIG)
 
                 # Set the static directory as where vite builds to
                 STATIC_DIR = Path("spa-src/dist/static")
 
                 # Set the file paths
                 FILE_PATHS = dict(
-                    _resources =     ctx.DOCS_DIST_DIRPATH/"_resources",
+                    _resources = ctx.DOCS_DIST_DIRPATH/"_resources",
                     static = STATIC_DIR
                 )
 
                 async def run_server():
                     PORT = 8100
                     ADDRESS = "localhost"
-                    server = DocdDevServer(SPA_TEMPLATE,FILE_PATHS)
+                    server = DocdDevServer(rendered_spa_html,FILE_PATHS)
                     server.listen(PORT,address=ADDRESS)
                     print(f"Running at {ADDRESS}:{PORT}")
                     await asyncio.Event().wait()
