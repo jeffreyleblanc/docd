@@ -13,6 +13,7 @@ from docd.utils.proc import proc, local_rsync
 from docd.utils.obj import DictObj
 from docd.utils.filetools import clear_directory, find_one_matching_file
 from docd.spa import render_spa_html
+from docd.publisher import Publisher
 
 
 @dataclass
@@ -97,14 +98,17 @@ def main():
     subparsers = parser.add_subparsers(help="sub-command help",dest="main_command")
     A = subparsers.add_parser
 
-    # Main commands
-    A("clean-dist", help="Clean out the docd site")
+    # Main build commands
+    A("build-all", help="Build the entire system")
+    A("build-clean", help="Clean out the docd site")
     A("build-pages", help="Build the rendered pages")
     A("build-search", help="Build the search index")
     A("build-spa", help="Build the dist spa")
+    # Devserver
     a = A("devserver", help="Run the new server")
     a.add_argument("--port",default=8100)
     a.add_argument("--address",default="localhost")
+    # Developer Tools
     a = A("developer", help="Docd developer tools")
     a.add_argument("devcmd",choices=("clear-spa-framework","build-spa-framework"))
 
@@ -191,50 +195,67 @@ def main():
         # Load the config
         config = load_config(ctx.DOCS_CONFIG_FILEPATH)
 
+        # Our build methods
+
+        def build_clean():
+            assert ctx.DOCS_DIST_DIRPATH.is_dir()
+            clear_directory(ctx.DOCS_DIST_DIRPATH)
+
+        def build_pages():
+            pub = Publisher(ctx,config)
+            pub.build_dest_directory_structure()
+            pub.build_docs()
+
+        def build_search():
+            pub = Publisher(ctx,config)
+            pub.build_dest_directory_structure()
+            pub.build_search_index()
+
+        def build_spa():
+            # Load the static info
+            static_info = json.loads(SPA_FRAMEWORK_DIST_RESOURCES_JSON_FILE.read_text())
+
+            # Make the spa html
+            spa_html = render_spa_html({
+                "__ROOT_URI__": config.site.root_uri,
+                "__TITLE__":    config.site.title,
+                "__AUTHOR__":   config.site.author,
+                "__NAME__" :    config.site.name,
+                "__FOOTER__":   config.site.footer,
+                "__HOME_URL__": config.site.home_addr,
+                "__CSS_FILE__": f"{config.site.root_uri}/_resources/static/{static_info['css_file_name']}",
+                "__JS_FILE__":  f"{config.site.root_uri}/_resources/static/{static_info['js_file_name']}"
+            })
+
+            # Write it to file
+            _DIST_SPA_FILE = ctx.DOCS_DIST_DIRPATH/"index.html"
+            with _DIST_SPA_FILE.open("w") as f:
+                f.write(spa_html)
+
+            # Sync over the static assets
+            _STATIC_DIR = ctx.DOCS_DIST_DIRPATH/"_resources/static"
+            _STATIC_DIR.mkdir(exist_ok=True,parents=True)
+            local_rsync(SPA_FRAMEWORK_DIST_STATIC_DIR,_STATIC_DIR,delete=True)
+
         # Execute the command
         match args.main_command:
+            case "build-all":
+                build_clean()
+                build_pages()
+                build_search()
+                build_spa()
 
-            case "clean-dist":
-                assert ctx.DOCS_DIST_DIRPATH.is_dir()
-                clear_directory(ctx.DOCS_DIST_DIRPATH)
+            case "build-clean":
+                build_clean()
 
             case "build-pages":
-                from docd.publisher import Publisher
-                pub = Publisher(ctx,config)
-                pub.build_dest_directory_structure()
-                pub.build_docs()
+                build_pages()
 
             case "build-search":
-                from docd.publisher import Publisher
-                pub = Publisher(ctx,config)
-                pub.build_dest_directory_structure()
-                pub.build_search_index()
+                build_search()
 
             case "build-spa":
-                # Load the static info
-                static_info = json.loads(SPA_FRAMEWORK_DIST_RESOURCES_JSON_FILE.read_text())
-
-                # Make the spa html
-                spa_html = render_spa_html({
-                    "__ROOT_URI__": config.site.root_uri,
-                    "__TITLE__":    config.site.title,
-                    "__AUTHOR__":   config.site.author,
-                    "__NAME__" :    config.site.name,
-                    "__FOOTER__":   config.site.footer,
-                    "__HOME_URL__": config.site.home_addr,
-                    "__CSS_FILE__": f"{config.site.root_uri}/_resources/static/{static_info['css_file_name']}",
-                    "__JS_FILE__":  f"{config.site.root_uri}/_resources/static/{static_info['js_file_name']}"
-                })
-
-                # Write it to file
-                _DIST_SPA_FILE = ctx.DOCS_DIST_DIRPATH/"index.html"
-                with _DIST_SPA_FILE.open("w") as f:
-                    f.write(spa_html)
-
-                # Sync over the static assets
-                _STATIC_DIR = ctx.DOCS_DIST_DIRPATH/"_resources/static"
-                _STATIC_DIR.mkdir(exist_ok=True,parents=True)
-                local_rsync(SPA_FRAMEWORK_DIST_STATIC_DIR,_STATIC_DIR,delete=True)
+                build_spa()
 
             case "devserver":
                 import asyncio
