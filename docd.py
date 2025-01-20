@@ -238,7 +238,7 @@ def main():
                 import asyncio
                 from docd.devserver import DocdDevServer
 
-                # Make a temporary config for now
+                # Make a rendered spa template
                 # Leave off the css and js as those will be dynamically added
                 rendered_spa_html = render_spa_html({
                     "__ROOT_URI__": config.site.root_uri,
@@ -249,13 +249,10 @@ def main():
                     "__HOME_URL__": config.site.home_addr
                 })
 
-                # Set the static directory as where vite builds to
-                STATIC_DIR = Path("spa-src/dist/static")
-
                 # Set the file paths
                 FILE_PATHS = dict(
                     _resources = ctx.DOCS_DIST_DIRPATH/"_resources",
-                    static = STATIC_DIR
+                    static = SPA_SRC_STATIC_DIST_STATIC_DIR
                 )
 
                 async def run_server():
