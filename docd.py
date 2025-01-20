@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import shutil
 import toml
 import json
-from docd.utils.proc import proc
+from docd.utils.proc import proc, rsync
 from docd.utils.obj import DictObj
 from docd.utils.filetools import clear_directory, find_one_matching_file
 from docd.spa import render_spa_html
@@ -95,6 +95,7 @@ if __name__ == "__main__":
     A("clean-dist", help="Clean out the docd site")
     A("build-pages", help="Build the rendered pages")
     A("build-search", help="Build the search index")
+    A("build-spa", help="Build the dist spa")
     A("devserver", help="Run the new server")
     a = A("developer", help="Docd developer tools")
     a.add_argument("devcmd",choices=("clear-spa-framework","build-spa-framework"))
@@ -161,8 +162,8 @@ if __name__ == "__main__":
 
             # Build out the config against the files
             rendered_spa_html = render_spa_html({
-                "__CSS_FILE__": f"/static/{CSS_FILE.name}",
-                "__JS_FILE__":  f"/static/{JS_FILE.name}"
+                "__CSS_FILE__": f"/_resources/static/{CSS_FILE.name}",
+                "__JS_FILE__":  f"/_resources/static/{JS_FILE.name}"
             })
             with (SPA_DIST_DIR/"index.html").open("w") as fp:
                 fp.write(rendered_spa_html)
@@ -201,6 +202,32 @@ if __name__ == "__main__":
                 pub.build_dest_directory_structure()
                 pub.build_search_index()
 
+            case "build-spa":
+                # Define paths
+                SPA_DIST_DIR = Path("spa-framework-dist/dist")
+                SPA_DIST_STATIC_DIR = SPA_DIST_DIR/"static"
+                SPA_DIST_SPA_FILE = SPA_DIST_DIR/"index.html"
+                assert(SPA_DIST_SPA_FILE.is_file())
+
+                # Make the spa html
+                _spa_html = SPA_DIST_SPA_FILE.read_text()
+                spa_html = render_spa_html({
+                    "__TITLE__":    config.site.title,
+                    "__AUTHOR__":   config.site.author,
+                    "__NAME__" :    config.site.name,
+                    "__FOOTER__":   config.site.footer,
+                    "__HOME_URL__": config.site.home_addr
+                },template_text=_spa_html)
+
+                # Write it to file
+                DIST_SPA_FILE = ctx.DOCS_DIST_DIRPATH/"index.html"
+                with DIST_SPA_FILE.open("w") as f:
+                    f.write(spa_html)
+
+                # Sync over the static assets
+                STATIC_DIR = ctx.DOCS_DIST_DIRPATH/"_resources/static"
+                STATIC_DIR.mkdir(exist_ok=True)
+                rsync(SPA_DIST_STATIC_DIR,STATIC_DIR,delete=True)
 
             case "devserver":
                 import asyncio
