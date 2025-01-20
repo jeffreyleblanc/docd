@@ -11,7 +11,7 @@ import toml
 import json
 from docd.utils.proc import proc
 from docd.utils.obj import DictObj
-from docd.utils.filetools import find_one_matching_file
+from docd.utils.filetools import clear_directory, find_one_matching_file
 
 @dataclass
 class DocdRunContext:
@@ -141,11 +141,7 @@ if __name__ == "__main__":
         # Build and clear the spa-dist static directory
         SPA_DIST_STATIC_DIR = SPA_DIST_DIR/"static"
         SPA_DIST_STATIC_DIR.mkdir(exist_ok=True,parents=True)
-        for fp in SPA_DIST_STATIC_DIR.iterdir():
-            if fp.is_dir():
-                shutil.rmtree(fp)
-            else:
-                fp.unlink()
+        clear_directory(SPA_DIST_STATIC_DIR)
 
         # Determine the js/css paths
         JS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIR,"*.js")
@@ -195,11 +191,7 @@ if __name__ == "__main__":
             case "clean-dist":
                 import shutil
                 assert ctx.DOCS_DIST_DIRPATH.is_dir()
-                for fp in ctx.DOCS_DIST_DIRPATH.iterdir():
-                    if fp.is_dir():
-                        shutil.rmtree(fp)
-                    else:
-                        fp.unlink()
+                clear_directory(ctx.DOCS_DIST_DIRPATH)
 
             case "build-pages":
                 from docd.publisher import Publisher

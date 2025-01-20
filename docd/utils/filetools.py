@@ -5,10 +5,9 @@ from pathlib import Path
 import shutil
 import hashlib
 
-def clear_directory(dir_path):
-    # Note not 'safety' tested
-    dir_path = Path(dir_path)
-    for child in dir_path.iterdir():
+def clear_directory(directory):
+    directory = directory if isinstance(directory,Path) else Path(directory)
+    for child in directory.iterdir():
         if child.is_dir():
             shutil.rmtree(child)
         elif child.is_file():
@@ -29,6 +28,7 @@ def file_sha256(filepath):
     return hasher.hexdigest()
 
 def find_one_matching_file(directory, glob):
+    directory = directory if isinstance(directory,Path) else Path(directory)
     results = [ e for e in directory.glob(glob) ]
     if len(results) > 1:
         raise Exception(f"Found too many results for {directory} => {glob}")
