@@ -4,11 +4,6 @@
 
 Build System
 
-* [ ] Initial code DRY
-    * [x] Make the finding source paths a common method
-        * [x] Add error handling
-    * [x] Make emptying a directory, a common method
-    * [ ] Make the spa template handling a common method
 * [ ] `spa-dist/` => `spa-framework-dist/`
 * [ ] `make-spa-framework` => `developer build-spa-framework`
 * [ ] Make a `developer clear-spa-framework`
