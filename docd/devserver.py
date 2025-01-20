@@ -23,26 +23,24 @@ class MainHandler(tornado.web.RequestHandler):
 
 class DocdDevServer(tornado.web.Application):
 
-    def __init__(self, SPA_TEMPLATE, FILE_PATHS):
+    def __init__(self, SPA_TEMPLATE, FILE_PATHS, ROOT_URI):
         self._handlers = []
         self._settings = {}
-        self.initialize(SPA_TEMPLATE, FILE_PATHS)
+        self.initialize(SPA_TEMPLATE, FILE_PATHS, ROOT_URI)
         super().__init__(self._handlers,**self._settings)
 
-    def initialize(self, SPA_TEMPLATE, FILE_PATHS):
+    def initialize(self, SPA_TEMPLATE, FILE_PATHS, ROOT_URI):
         self.SPA_TEMPLATE  = SPA_TEMPLATE
         self.FILE_PATHS = FILE_PATHS
+        self.ROOT_URI = ROOT_URI
 
         # Handlers
         self._handlers += [
             # File Handlers
-            (r"^/_resources/static/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["static"]}),
-            (r"^/_resources/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["_resources"]}),
-            # (r"^/_media/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["media"]}),
-            # (r"^/_search/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["search"]}),
-            # (r"^/static/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["static"]}),
+            (rf"^{self.ROOT_URI}/_resources/static/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["static"]}),
+            (rf"^{self.ROOT_URI}/_resources/(.*)", tornado.web.StaticFileHandler, {"path": self.FILE_PATHS["_resources"]}),
             # Catch the rest of it as an SPA
-            (r"^/(.*)", MainHandler),
+            (fr"^{self.ROOT_URI}/(.*)", MainHandler),
         ]
 
         # Settings
@@ -58,6 +56,6 @@ class DocdDevServer(tornado.web.Application):
 
         # Return the paths
         return {
-            "__JS_FILE__":  f"/_resources/static/{JS_FILE.name}",
-            "__CSS_FILE__": f"/_resources/static/{CSS_FILE.name}",
+            "__JS_FILE__":  f"{self.ROOT_URI}/_resources/static/{JS_FILE.name}",
+            "__CSS_FILE__": f"{self.ROOT_URI}/_resources/static/{CSS_FILE.name}",
         }

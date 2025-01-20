@@ -12,7 +12,7 @@ export default class DataManager {
         this.$G = G;
 
         // Our API URI Library
-        const URIROOT = "/_resources";
+        const URIROOT = `${config.root_uri}/_resources`;
         this.API_URIS = {};
         this.API_URIS.PAGE_DB_FILE =      `${URIROOT}/pages-database.json?h=${random_string()}`;
         this.API_URIS.SEARCH_INDEX_FILE = `${URIROOT}/search/serialized-index.json?h=${random_string()}`;

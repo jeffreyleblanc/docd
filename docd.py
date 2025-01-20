@@ -219,6 +219,7 @@ if __name__ == "__main__":
 
                 # Make the spa html
                 spa_html = render_spa_html({
+                    "__ROOT_URI__": config.site.root_uri,
                     "__TITLE__":    config.site.title,
                     "__AUTHOR__":   config.site.author,
                     "__NAME__" :    config.site.name,
@@ -245,6 +246,7 @@ if __name__ == "__main__":
                 # Make a temporary config for now
                 # Leave off the css and js as those will be dynamically added
                 rendered_spa_html = render_spa_html({
+                    "__ROOT_URI__": config.site.root_uri,
                     "__TITLE__":    config.site.title,
                     "__AUTHOR__":   config.site.author,
                     "__NAME__" :    config.site.name,
@@ -264,7 +266,11 @@ if __name__ == "__main__":
                 async def run_server():
                     PORT = 8100
                     ADDRESS = "localhost"
-                    server = DocdDevServer(rendered_spa_html,FILE_PATHS)
+                    server = DocdDevServer(
+                        rendered_spa_html,
+                        FILE_PATHS,
+                        config.site.root_uri
+                    )
                     server.listen(PORT,address=ADDRESS)
                     print(f"Running at {ADDRESS}:{PORT}")
                     await asyncio.Event().wait()

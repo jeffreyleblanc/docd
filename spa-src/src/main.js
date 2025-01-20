@@ -16,6 +16,7 @@ import ArticleView from "./vue/ArticleView.vue"
 function main(){
     // Get the config
     const config = {
+        root_uri: window.$ROOT_URI,
         name: window.$NAME,
         footer_text: window.$FOOTER,
         home_addr: window.$HOME_ADDR
@@ -25,9 +26,9 @@ function main(){
     G.mng = new DataManager(G,config);
 
     const routes = [
-        { name: "home", path: "/", component: HomeView },
+        { name: "home", path: `${config.root_uri}/`, component: HomeView },
         // see https://router.vuejs.org/guide/essentials/route-matching-syntax#Repeatable-params
-        { name: "pageview", path: "/view/:pagepath+", component: ArticleView },
+        { name: "pageview", path: `${config.root_uri}/view/:pagepath+`, component: ArticleView },
     ]
 
     G.router = createRouter({

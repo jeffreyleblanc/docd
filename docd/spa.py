@@ -11,6 +11,7 @@ SPA_TEMPLATE = SPA_SRC_SPA_TEMPLATE_FILE.read_text()
 
 # The expected keys in the template
 SPA_CONFIG_KEYS = (
+    "__ROOT_URI__",
     "__TITLE__",
     "__AUTHOR__",
     "__NAME__",
