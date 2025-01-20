@@ -92,11 +92,12 @@ if __name__ == "__main__":
     A = subparsers.add_parser
 
     # Main commands
-    A("make-spa-framework", help="Build a distributable version of the spa files")
     A("clean-dist", help="Clean out the docd site")
     A("build-pages", help="Build the rendered pages")
     A("build-search", help="Build the search index")
     A("devserver", help="Run the new server")
+    a = A("developer", help="Docd developer tools")
+    a.add_argument("devcmd",choices=("clear-spa-framework","build-spa-framework"))
 
     # Older
     A("push", help="Push docs to a remote")
@@ -126,39 +127,45 @@ if __name__ == "__main__":
 
     #-- Execute the Commands -----------------------------------------------------------#
 
-    if "make-spa-framework" == args.main_command:
+    if "developer" == args.main_command:
         # Determine paths
         SPA_SRC_DIR = Path("spa-src")
         SPA_SRC_STATIC_DIR = SPA_SRC_DIR/"dist/static"
+        SPA_DIST_DIR = Path("spa-framework-dist/dist")
 
-        # Build the js/css with vite
-        print("Building the js/css with vite:")
-        c,o,e = proc("npx vite build",cwd=SPA_SRC_DIR)
-        print(c,o,e)
+        if "clear-spa-framework" == args.devcmd:
+            if SPA_DIST_DIR.is_dir():
+                clear_directory(SPA_DIST_DIR)
 
-        # Set the spa-dist directory
-        SPA_DIST_DIR = Path("spa-dist/dist")
+        elif "build-spa-framework" == args.devcmd:
+            # Build the js/css with vite
+            print("Building the js/css with vite:")
+            c,o,e = proc("npx vite build",cwd=SPA_SRC_DIR)
+            print(c,o,e)
 
-        # Build and clear the spa-dist static directory
-        SPA_DIST_STATIC_DIR = SPA_DIST_DIR/"static"
-        SPA_DIST_STATIC_DIR.mkdir(exist_ok=True,parents=True)
-        clear_directory(SPA_DIST_STATIC_DIR)
+            # Set the spa-dist directory
+            SPA_DIST_DIR = Path("spa-framework-dist/dist")
 
-        # Determine the js/css paths
-        JS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIR,"*.js")
-        CSS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIR,"*.css")
+            # Build and clear the spa-dist static directory
+            SPA_DIST_STATIC_DIR = SPA_DIST_DIR/"static"
+            SPA_DIST_STATIC_DIR.mkdir(exist_ok=True,parents=True)
+            clear_directory(SPA_DIST_STATIC_DIR)
 
-        # Copy the paths to spa-dist
-        shutil.copy(JS_FILE,SPA_DIST_STATIC_DIR/JS_FILE.name)
-        shutil.copy(CSS_FILE,SPA_DIST_STATIC_DIR/CSS_FILE.name)
+            # Determine the js/css paths
+            JS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIR,"*.js")
+            CSS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIR,"*.css")
 
-        # Build out the config against the files
-        rendered_spa_html = render_spa_html({
-            "__CSS_FILE__": f"/static/{CSS_FILE.name}",
-            "__JS_FILE__":  f"/static/{JS_FILE.name}"
-        })
-        with (SPA_DIST_DIR/"index.html").open("w") as fp:
-            fp.write(rendered_spa_html)
+            # Copy the paths to spa-dist
+            shutil.copy(JS_FILE,SPA_DIST_STATIC_DIR/JS_FILE.name)
+            shutil.copy(CSS_FILE,SPA_DIST_STATIC_DIR/CSS_FILE.name)
+
+            # Build out the config against the files
+            rendered_spa_html = render_spa_html({
+                "__CSS_FILE__": f"/static/{CSS_FILE.name}",
+                "__JS_FILE__":  f"/static/{JS_FILE.name}"
+            })
+            with (SPA_DIST_DIR/"index.html").open("w") as fp:
+                fp.write(rendered_spa_html)
 
     else:
         # Determine the doc repo paths
