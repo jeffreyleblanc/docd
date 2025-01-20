@@ -4,7 +4,7 @@
 
 Build System
 
-* [ ] Clean up all the pathnames in `docd.py`
+* [x] Clean up all the pathnames in `docd.py`
 * [ ] Use kwargs for DocdDevServer init
 * [ ] Make a `build-all` command
 * [ ] Make the `push` command work again

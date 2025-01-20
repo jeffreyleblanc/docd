@@ -23,17 +23,18 @@ class MainHandler(tornado.web.RequestHandler):
 
 class DocdDevServer(tornado.web.Application):
 
-    def __init__(self, SPA_TEMPLATE, FILE_PATHS, ROOT_URI):
-        self._handlers = []
-        self._settings = {}
-        self.initialize(SPA_TEMPLATE, FILE_PATHS, ROOT_URI)
-        super().__init__(self._handlers,**self._settings)
-
-    def initialize(self, SPA_TEMPLATE, FILE_PATHS, ROOT_URI):
+    def __init__(self, SPA_TEMPLATE=None, FILE_PATHS=None, ROOT_URI=None):
         self.SPA_TEMPLATE  = SPA_TEMPLATE
         self.FILE_PATHS = FILE_PATHS
         self.ROOT_URI = ROOT_URI
 
+        self._handlers = []
+        self._settings = {}
+
+        self.initialize()
+        super().__init__(self._handlers,**self._settings)
+
+    def initialize(self):
         # Handlers
         self._handlers += [
             # File Handlers

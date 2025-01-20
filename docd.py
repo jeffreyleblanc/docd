@@ -102,7 +102,9 @@ def main():
     A("build-pages", help="Build the rendered pages")
     A("build-search", help="Build the search index")
     A("build-spa", help="Build the dist spa")
-    A("devserver", help="Run the new server")
+    a = A("devserver", help="Run the new server")
+    a.add_argument("--port",default=8100)
+    a.add_argument("--address",default="localhost")
     a = A("developer", help="Docd developer tools")
     a.add_argument("devcmd",choices=("clear-spa-framework","build-spa-framework"))
 
@@ -256,15 +258,13 @@ def main():
                 )
 
                 async def run_server():
-                    PORT = 8100
-                    ADDRESS = "localhost"
                     server = DocdDevServer(
-                        rendered_spa_html,
-                        FILE_PATHS,
-                        config.site.root_uri
+                        SPA_TEMPLATE= rendered_spa_html,
+                        FILE_PATHS= FILE_PATHS,
+                        ROOT_URI= config.site.root_uri
                     )
-                    server.listen(PORT,address=ADDRESS)
-                    print(f"Running at {ADDRESS}:{PORT}")
+                    server.listen(args.port,address=args.address)
+                    print(f"Running at {args.address}:{args.port}")
                     await asyncio.Event().wait()
 
                 asyncio.run(run_server())
