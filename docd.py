@@ -57,8 +57,15 @@ def load_config(config_fpath):
     for k in ( "site.title","site.author","site.name","site.footer" ):
         if config.get_path(k) is None:
             raise Exception(f"docd.toml missing `{k}`")
+    # Set an empty home_addr if none
     if "home_addr" not in config.site:
         config.site.home_addr = ""
+    # Check on the site.root_uri
+    if "root_uri" not in config.site:
+        config.site.root_uri = ""
+    else:
+        assert config.site.root_uri.startswith("/")
+        assert not config.site.root_uri.endswith("/")
 
     # Check on 'remote' attributes
     if "remote" not in config:
@@ -160,13 +167,13 @@ if __name__ == "__main__":
             shutil.copy(JS_FILE,SPA_DIST_STATIC_DIR/JS_FILE.name)
             shutil.copy(CSS_FILE,SPA_DIST_STATIC_DIR/CSS_FILE.name)
 
-            # Build out the config against the files
-            rendered_spa_html = render_spa_html({
-                "__CSS_FILE__": f"/_resources/static/{CSS_FILE.name}",
-                "__JS_FILE__":  f"/_resources/static/{JS_FILE.name}"
-            })
-            with (SPA_DIST_DIR/"index.html").open("w") as fp:
-                fp.write(rendered_spa_html)
+            # Write out the static resource names
+            with (SPA_DIST_DIR/"static-resources.json").open("w") as fp:
+                fp.write(json.dumps({
+                    "js_file_name": JS_FILE.name,
+                    "css_file_name": CSS_FILE.name
+                },indent=4))
+
 
     else:
         # Determine the doc repo paths
@@ -206,18 +213,20 @@ if __name__ == "__main__":
                 # Define paths
                 SPA_DIST_DIR = Path("spa-framework-dist/dist")
                 SPA_DIST_STATIC_DIR = SPA_DIST_DIR/"static"
-                SPA_DIST_SPA_FILE = SPA_DIST_DIR/"index.html"
-                assert(SPA_DIST_SPA_FILE.is_file())
+
+                # Load the static info
+                static_info = json.loads((SPA_DIST_DIR/"static-resources.json").read_text())
 
                 # Make the spa html
-                _spa_html = SPA_DIST_SPA_FILE.read_text()
                 spa_html = render_spa_html({
                     "__TITLE__":    config.site.title,
                     "__AUTHOR__":   config.site.author,
                     "__NAME__" :    config.site.name,
                     "__FOOTER__":   config.site.footer,
-                    "__HOME_URL__": config.site.home_addr
-                },template_text=_spa_html)
+                    "__HOME_URL__": config.site.home_addr,
+                    "__CSS_FILE__": f"{config.site.root_uri}/_resources/static/{static_info['css_file_name']}",
+                    "__JS_FILE__":  f"{config.site.root_uri}/_resources/static/{static_info['js_file_name']}"
+                })
 
                 # Write it to file
                 DIST_SPA_FILE = ctx.DOCS_DIST_DIRPATH/"index.html"
