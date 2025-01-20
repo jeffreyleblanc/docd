@@ -4,8 +4,8 @@
 
 Build System
 
-* [ ] Make the `check` command work again
-    * [ ] use normal grep for that
+* [x] Make the `check` command work again
+    * [x] use normal grep for that
 * [ ] Make the `push` command work again
     * [ ] Test
     * [ ] Show the caddy fragment needed

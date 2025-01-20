@@ -106,7 +106,7 @@ def main():
     A("build-spa", help="Build the dist spa")
 
     # Tools and Devserver
-    A("check", help="Check docs for filter phrases")
+    A("filter-check", help="Check docs for filter phrases")
     a = A("devserver", help="Run the new server")
     a.add_argument("--port",default=8100)
     a.add_argument("--address",default="localhost")
@@ -291,9 +291,9 @@ def main():
 
                 asyncio.run(run_server())
 
-            case "check":
-                import docd.cmd_check as CHECK
-                CHECK.main_run(ctx,config)
+            case "filter-check":
+                from docd.filtercheck import run_filter_check
+                run_filter_check(ctx,config)
 
         ## Older #################################################
 

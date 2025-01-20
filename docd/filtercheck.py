@@ -7,15 +7,12 @@ A tool to check a directory for files containing phrases
 
 # Python
 from pathlib import Path
-# Things
-import toml
 # Local
 from docd.utils.proc import proc
 
-def main_run(ctx, config):
-    run_check(ctx.DOCS_DOCS_DIRPATH, config)
 
-def run_check(ROOT_DIR, config):
+def run_filter_check(ctx, config):
+    ROOT_DIR = ctx.DOCS_DOCS_DIRPATH
     PHRASES = list(filter(len,config.check.filter_phrases.splitlines()))
 
     # Review the files
