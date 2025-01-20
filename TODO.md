@@ -4,8 +4,6 @@
 
 Build System
 
-* [x] Make the `check` command work again
-    * [x] use normal grep for that
 * [ ] Make the `push` command work again
     * [ ] Test
     * [ ] Show the caddy fragment needed
@@ -23,12 +21,11 @@ UI
 Markdown
 
 * [ ] Update the markdown
-    * Don't try to guess syntax 
+    * Don't try to guess syntax
 
 Close Out and Deploy
 
 * [ ] Update the dependencies notes
-* [ ] Version the search index
 * [ ] Enable hosting sites to work with new output using caddy
 * [ ] Push as a test
 * [ ] Move the branch to master
@@ -38,6 +35,7 @@ Close Out and Deploy
 
 ## Follow On Steps
 
+* [ ] Version the search index
 * [ ] Enable the tornado in dev mode to request a page markdown rebuilt on the fly
     * [ ] basically, if I'm editing the source git file, if I just refresh, get the new one
           without the need to run any cli commands
@@ -48,3 +46,4 @@ Close Out and Deploy
 * make the page-build step smarter about only building/copying changes
 * add different lunrjs search syntax cheatsheet
 * enabled arrows/tab to navigate the search results
+* handle 404 in the spa vue-router for missing pages
