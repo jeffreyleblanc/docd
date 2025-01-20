@@ -4,7 +4,7 @@
 
 Build System
 
-* [ ] have the devserver use the actual docd.toml values for spa
+* [x] have the devserver use the actual docd.toml values for spa
 * [ ] Make a `build-spa` command which will take `spa-dist` and actually put the proper stuff in `DOCS/_dist`
     * [ ] Have it confirm the `spa-dist` isn't empty
 * [ ] Enable a uri_base path option, that sets things in the spa template and works with the devserver

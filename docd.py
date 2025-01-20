@@ -208,14 +208,13 @@ if __name__ == "__main__":
 
                 # Make a temporary config for now
                 # Leave off the css and js as those will be dynamically added
-                SPA_CONFIG = {
-                    "__TITLE__":    "Temp TITLE",
-                    "__AUTHOR__":   "Alice and Bob",
-                    "__NAME__" :    "Sample Docs",
-                    "__FOOTER__":   "Copyright Me",
-                    "__HOME_URL__": "/"
-                }
-                rendered_spa_html = render_spa_html(SPA_CONFIG)
+                rendered_spa_html = render_spa_html({
+                    "__TITLE__":    config.site.title,
+                    "__AUTHOR__":   config.site.author,
+                    "__NAME__" :    config.site.name,
+                    "__FOOTER__":   config.site.footer,
+                    "__HOME_URL__": config.site.home_addr
+                })
 
                 # Set the static directory as where vite builds to
                 STATIC_DIR = Path("spa-src/dist/static")
