@@ -9,6 +9,8 @@ from pathlib import Path
 import json
 import asyncio
 import tornado
+# Local
+from docd.utils.filetools import find_one_matching_file
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -52,11 +54,11 @@ class DocdDevServer(tornado.web.Application):
 
     def fetch_static_paths(self):
         # Find the paths
-        js_file = [ e for e in self.FILE_PATHS["static"].glob("*.js") ][0]
-        css_file = [ e for e in self.FILE_PATHS["static"].glob("*.css") ][0]
+        JS_FILE = find_one_matching_file(self.FILE_PATHS["static"],"*.js")
+        CSS_FILE = find_one_matching_file(self.FILE_PATHS["static"],"*.css")
 
         # Return the paths
         return {
-            "__JS_FILE__":  f"/_resources/static/{js_file.name}",
-            "__CSS_FILE__": f"/_resources/static/{css_file.name}",
+            "__JS_FILE__":  f"/_resources/static/{JS_FILE.name}",
+            "__CSS_FILE__": f"/_resources/static/{CSS_FILE.name}",
         }

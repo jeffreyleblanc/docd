@@ -11,6 +11,7 @@ import toml
 import json
 from docd.utils.proc import proc
 from docd.utils.obj import DictObj
+from docd.utils.filetools import find_one_matching_file
 
 @dataclass
 class DocdRunContext:
@@ -147,15 +148,12 @@ if __name__ == "__main__":
                 fp.unlink()
 
         # Determine the js/css paths
-        """
-        !! This is is duplicated in devserver, so move to common place
-        """
-        js_file = [ e for e in SPA_SRC_STATIC_DIR.glob("*.js") ][0]
-        css_file = [ e for e in SPA_SRC_STATIC_DIR.glob("*.css") ][0]
+        JS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIR,"*.js")
+        CSS_FILE = find_one_matching_file(SPA_SRC_STATIC_DIR,"*.css")
 
         # Copy the paths to spa-dist
-        shutil.copy(js_file,SPA_DIST_STATIC_DIR/js_file.name)
-        shutil.copy(css_file,SPA_DIST_STATIC_DIR/css_file.name)
+        shutil.copy(JS_FILE,SPA_DIST_STATIC_DIR/JS_FILE.name)
+        shutil.copy(CSS_FILE,SPA_DIST_STATIC_DIR/CSS_FILE.name)
 
         # Load the spa page template
         with SPA_SRC_SPA_TEMPLATE_FILE.open("r") as fp:
@@ -168,8 +166,8 @@ if __name__ == "__main__":
             # "__NAME__" :    "Sample Docs",
             # "__FOOTER__":   "Copyright Me",
             # "__HOME_URL__": "/",
-            "__CSS_FILE__": f"/static/{css_file.name}",
-            "__JS_FILE__":  f"/static/{js_file.name}"
+            "__CSS_FILE__": f"/static/{CSS_FILE.name}",
+            "__JS_FILE__":  f"/static/{JS_FILE.name}"
         }
         for k,v in SPA_CONFIG.items():
             SPA_TEMPLATE = SPA_TEMPLATE.replace(k,v)
@@ -276,6 +274,8 @@ if __name__ == "__main__":
             CHECK.main_run(ctx,config)
 
         case "push":
+            #==> use the rsync tool from utils.proc
+
             # Pull out info
             remote = config.remote
             if remote is None:

@@ -27,3 +27,11 @@ def file_sha256(filepath):
         for chunk in iter(lambda: f.read(4096), b""):
             hasher.update(chunk)
     return hasher.hexdigest()
+
+def find_one_matching_file(directory, glob):
+    results = [ e for e in directory.glob(glob) ]
+    if len(results) > 1:
+        raise Exception(f"Found too many results for {directory} => {glob}")
+    if len(results) == 0:
+        raise Exception(f"Found no results for {directory} => {glob}")
+    return results[0]
