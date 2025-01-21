@@ -115,13 +115,12 @@ def main():
     a.add_argument("--port",default=8100)
     a.add_argument("--address",default="localhost")
 
+    # Older
+    A("push-to-site", help="Push docs to a remote site")
+
     # Developer Tools
     a = A("developer", help="Docd developer tools")
     a.add_argument("devcmd",choices=("clear-spa-framework","build-spa-framework"))
-
-    # Older
-    A("push", help="Push docs to a remote")
-    A("info", help="Print info on the repo config")
 
     #-- Process args -----------------------------------------------------------#
 
@@ -243,6 +242,9 @@ def main():
             _STATIC_DIR.mkdir(exist_ok=True,parents=True)
             local_rsync(SPA_FRAMEWORK_DIST_STATIC_DIR,_STATIC_DIR,delete=True)
 
+            # Touch that this is managed by docd
+            (ctx.DOCS_DIST_DIRPATH/".managed-by-docd").touch(exist_ok=True)
+
         # Execute the command
         match args.main_command:
             case "build-all":
@@ -303,54 +305,44 @@ def main():
                     case_sensitive=args.case_sensitive
                 )
 
-        ## Older #################################################
+            case "push-to-site":
+                #==> use the local_rsync tool from utils.proc
 
-        """
-        case "info":
-            import pprint
-            pp = pprint.PrettyPrinter(indent=4)
-            print("# args:")
-            pp.pprint(args)
-            print("\n# ctx:")
-            pp.pprint(ctx)
-            print("\n# config:")
-            print(json.dumps(config.to_dict(),indent=4))
+                # Pull out info
+                remote = config.remote
+                if remote is None:
+                    raise Exception("No remote is defined.")
+                user = remote.user
+                addr = remote.addr
+                remote_path = remote.path
 
-        case "check":
-            import docd.cmd_check as CHECK
-            CHECK.main_run(ctx,config)
+                print(user,addr,remote_path)
 
-        case "push":
-            #==> use the local_rsync tool from utils.proc
+                # Check if managed by docd
+                check_path = Path(remote_path)/".managed-by-docd"
+                cmd = f"ssh {user}@{addr} ls {check_path}"
+                c,o,e = proc(cmd)
+                print(c,o,e)
 
-            # Pull out info
-            remote = config.remote
-            if remote is None:
-                raise Exception("No remote is defined.")
-            user = remote.user
-            addr = remote.addr
-            remote_path = remote.path
+                return
 
-            # Assemble paths
-            src = f"{ctx.DOCS_DIST_DIRPATH}/."
-            dst = remote_path
-            if dst.endswith("/."):
-                pass
-            elif dst.endswith("/"):
-                dst += "."
-            else:
-                dst += "/."
-            assert src.endswith("/.") and not src.endswith("//.")
-            assert dst.endswith("/.") and not dst.endswith("//.")
+                # Assemble paths
+                src = f"{ctx.DOCS_DIST_DIRPATH}/."
+                dst = remote_path
+                if dst.endswith("/."):
+                    pass
+                elif dst.endswith("/"):
+                    dst += "."
+                else:
+                    dst += "/."
+                assert src.endswith("/.") and not src.endswith("//.")
+                assert dst.endswith("/.") and not dst.endswith("//.")
 
-            # Make the local_rsync command
-            cmd = f"local_rsync -avz --delete {src} {user}@{addr}:{dst}"
-            c,o,e = proc(cmd)
-            print(c,o,e)
+                # Make the local_rsync command
+                cmd = f"local_rsync -avz --delete {src} {user}@{addr}:{dst}"
+                c,o,e = proc(cmd)
+                print(c,o,e)
 
-        case _:
-            print("ERROR: Failed to find command `{args.main_command}`")
-        """
 
 if __name__ == "__main__":
     main()
