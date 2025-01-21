@@ -116,7 +116,8 @@ def main():
     a.add_argument("--address",default="localhost")
 
     # Older
-    A("push-to-site", help="Push docs to a remote site")
+    a = A("push-to-site", help="Push docs to a remote site")
+    a.add_argument("--force",action="store_true")
 
     # Developer Tools
     a = A("developer", help="Docd developer tools")
@@ -306,8 +307,6 @@ def main():
                 )
 
             case "push-to-site":
-                #==> use the local_rsync tool from utils.proc
-
                 # Pull out info
                 remote = config.remote
                 if remote is None:
@@ -316,15 +315,13 @@ def main():
                 addr = remote.addr
                 remote_path = remote.path
 
-                print(user,addr,remote_path)
-
                 # Check if managed by docd
                 check_path = Path(remote_path)/".managed-by-docd"
                 cmd = f"ssh {user}@{addr} ls {check_path}"
                 c,o,e = proc(cmd)
-                print(c,o,e)
-
-                return
+                if not args.force and c != 0:
+                    print("This path doesn't seem to be managed by docd. Use `--force` to force sync. Careful!!!")
+                    exit(1)
 
                 # Assemble paths
                 src = f"{ctx.DOCS_DIST_DIRPATH}/."
@@ -338,8 +335,8 @@ def main():
                 assert src.endswith("/.") and not src.endswith("//.")
                 assert dst.endswith("/.") and not dst.endswith("//.")
 
-                # Make the local_rsync command
-                cmd = f"local_rsync -avz --delete {src} {user}@{addr}:{dst}"
+                # Make the rsync command and run it
+                cmd = f"rsync -avz --delete {src} {user}@{addr}:{dst}"
                 c,o,e = proc(cmd)
                 print(c,o,e)
 
