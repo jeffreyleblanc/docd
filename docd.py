@@ -105,11 +105,16 @@ def main():
     A("build-search", help="Build the search index")
     A("build-spa", help="Build the dist spa")
 
-    # Tools and Devserver
-    A("filter-check", help="Check docs for filter phrases")
+    # Filter Check
+    a = A("filter-check", help="Check docs for filter phrases")
+    a.add_argument("-l","--files-only",action="store_true")
+    a.add_argument("--case-sensitive",action="store_true")
+
+    # Dev Server
     a = A("devserver", help="Run the new server")
     a.add_argument("--port",default=8100)
     a.add_argument("--address",default="localhost")
+
     # Developer Tools
     a = A("developer", help="Docd developer tools")
     a.add_argument("devcmd",choices=("clear-spa-framework","build-spa-framework"))
@@ -293,7 +298,10 @@ def main():
 
             case "filter-check":
                 from docd.filtercheck import run_filter_check
-                run_filter_check(ctx,config)
+                run_filter_check(ctx,config,
+                    files_only=args.files_only,
+                    case_sensitive=args.case_sensitive
+                )
 
         ## Older #################################################
 
