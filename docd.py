@@ -35,7 +35,7 @@ def load_config(config_fpath):
     if "source" not in config:
         config.source = DictObj({})
     if "max_depth" not in config.source:
-        config.source.max_depth = 2
+        config.source.max_depth = 100
     if not isinstance(config.source.max_depth,int):
         raise Exception("config.config.max_depth must be an integer")
     if "file_types" not in config.source:
