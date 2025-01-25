@@ -46,6 +46,31 @@ main_docs_repo/
 ```
 
 
+## 4. Caddy SPA Server Config
+
+If you are using [Caddy](https://caddyserver.com/) as your webserver, you can use a block like this:
+
+```
+    # Support /docs/ docd single page app
+    handle /docs/* {
+
+        handle /docs/_resources/* {
+            root * /var/www/html
+            file_server
+        }
+
+        handle {
+            root * /var/www/html
+            try_files {path} /docs/index.html
+            file_server
+        }
+    }
+```
+
+In this case `/var/www/html` is the root of the website's file system, so adjust accordingly.
+
+
+
 # -- OLDER -------------------------------------------------------------------------------- #
 
 
