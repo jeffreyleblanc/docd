@@ -2,25 +2,7 @@
 
 **SPRINT**
 
-Markdown
-
-* [x] Update the markdown
-    * Don't try to guess syntax
-
-UI
-
-* [x] Fix raw so it shows markdown links
-
-Close Out and Deploy
-
-* [ ] Update the notes
-    * [ ] lunr as a python dep
-    * [ ] docd.toml setup
-    * [ ] cli usage
-* [x] Enable hosting sites to work with new output using caddy
-* [ ] Push as a test (again)
-* [ ] Clean up the "follow on steps" section here
-* [ ] Move the branch to master
+* [x] Move the branch to master
 * [ ] Tag a release and version (in the cli too)
 * [ ] Push to github
 
