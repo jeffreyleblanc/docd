@@ -7,11 +7,24 @@
 It's designed to roughly mimic `mkdocs`, but have more flexbility.
 
 
-## 2. Dependencies
+## 2. Dependencies and Installation
+
+> More "modern" dependency and installation methods are on the TODO list
 
 ```sh
-$ sudo apt-get install rsync python3-tornado python3-markdown python3-toml
+$ sudo apt-get install make rsync python3-tornado python3-markdown python3-toml
 ```
+
+You can easily just run docd out of this repository, but to install/uninstall:
+
+```sh
+$ make install
+$ make uninstall
+```
+
+This adds `docd-cli.py` as `/usr/local/bin/docd` and syncs the contents of `docd/` into `/usr/lib/python3/dist-packages/docd`.
+
+Note that some cli commands must be run from within this repository, though all basic operations work with either method.
 
 
 ## 3. Development Setup
@@ -24,11 +37,11 @@ $ cd spa-src
 $ npx vite build --watch
 
 # Pane for building pages/search
-$ ./docd.py -R PATH_TO_DOCS_REPO build-pages
-$ ./docd.py -R PATH_TO_DOCS_REPO build-search
+$ ./docd-cli.py -R PATH_TO_DOCS_REPO build-pages
+$ ./docd-cli.py -R PATH_TO_DOCS_REPO build-search
 
 # Pane to run the devserver
-$ ./docd.py -R PATH_TO_DOCS_REPO devserver
+$ ./docd-cli.py -R PATH_TO_DOCS_REPO devserver
 ```
 
 Note you will need `nodejs` and `npm` installed.

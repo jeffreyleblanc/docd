@@ -30,6 +30,7 @@ Close Out and Deploy
 
 ## Follow On Steps
 
+* [ ] make the installation methods based on modern python/debian tooling
 * [ ] lunr search update
     * not getting common phrases like 'sway'?
     * not adding things from title fields?
