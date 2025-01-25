@@ -10,8 +10,6 @@ Markdown
 UI
 
 * [x] Fix raw so it shows markdown links
-* [ ] Make the "home" view use the actual index.md/html
-    * [ ] Make a fallback if it's not there
 
 Close Out and Deploy
 
@@ -29,6 +27,8 @@ Close Out and Deploy
 
 ## Follow On Steps
 
+* [ ] Make the "home" view use the actual index.md/html
+    * [ ] Make a fallback if it's not there
 * [ ] make the installation methods based on modern python/debian tooling
 * [ ] lunr search update
     * not getting common phrases like 'sway'?
