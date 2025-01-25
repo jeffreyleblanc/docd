@@ -2,10 +2,10 @@
 
 **SPRINT**
 
-Installable
+Markdown
 
-* [ ] Move spa-framework-dist into docd/
-* [ ] Make it work
+* [ ] Update the markdown
+    * Don't try to guess syntax
 
 UI
 
@@ -13,16 +13,14 @@ UI
 * [ ] Make the "home" view use the actual index.md/html
     * [ ] Make a fallback if it's not there
 
-Markdown
-
-* [ ] Update the markdown
-    * Don't try to guess syntax
-
 Close Out and Deploy
 
-* [ ] Update the dependencies notes
-* [ ] Enable hosting sites to work with new output using caddy
-* [ ] Push as a test
+* [ ] Update the notes
+    * [ ] docd.toml setup
+    * [ ] cli usage
+* [x] Enable hosting sites to work with new output using caddy
+* [ ] Push as a test (again)
+* [ ] Clean up the "follow on steps" section here
 * [ ] Move the branch to master
 * [ ] Tag a release and version (in the cli too)
 * [ ] Push to github
