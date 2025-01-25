@@ -135,7 +135,7 @@ def run_cli(IN_DOCD_SOURCE_REPO):
 
     # Make Context Object
     ctx = DocdRunContext()
-    ctx.IN_DOCD_SOURCE_REPO
+    ctx.IN_DOCD_SOURCE_REPO = IN_DOCD_SOURCE_REPO
 
     #-- Common Paths -------------------------------------------------------------------#
 
@@ -150,6 +150,10 @@ def run_cli(IN_DOCD_SOURCE_REPO):
     #-- Execute the Commands -----------------------------------------------------------#
 
     if "developer" == args.main_command:
+        if not ctx.IN_DOCD_SOURCE_REPO:
+            print("ERROR: You must run directly out of the docd source repository for this command.")
+            exit(1)
+
         if "clear-spa-framework" == args.devcmd:
             if SPA_FRAMEWORK_DIST_DIR.is_dir():
                 clear_directory(SPA_FRAMEWORK_DIST_DIR)
@@ -260,6 +264,10 @@ def run_cli(IN_DOCD_SOURCE_REPO):
                 build_spa()
 
             case "devserver":
+                if not ctx.IN_DOCD_SOURCE_REPO:
+                    print("ERROR: You must run directly out of the docd source repository for this command.")
+                    exit(1)
+
                 import asyncio
                 from docd.devserver import DocdDevServer
 
