@@ -20,15 +20,13 @@ SPDX-License-Indentifier: MIT
             </span>
         </div>
     </div>
+    <!-- Output -->
     <article
         v-if="article_view_mode=='rendered'"
         class="docd-article"
         v-html="current_html"
     />
-    <pre v-else
-        class="whitespace-pre-wrap"
-        v-html="current_raw_text"
-    />
+    <pre v-else class="whitespace-pre-wrap">{{current_raw_text}}</pre>
 </div>
 </template>
 <script>

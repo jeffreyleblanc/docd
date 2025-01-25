@@ -4,12 +4,12 @@
 
 Markdown
 
-* [ ] Update the markdown
+* [x] Update the markdown
     * Don't try to guess syntax
 
 UI
 
-* [ ] Fix raw so it shows markdown links
+* [x] Fix raw so it shows markdown links
 * [ ] Make the "home" view use the actual index.md/html
     * [ ] Make a fallback if it's not there
 
