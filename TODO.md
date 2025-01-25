@@ -1,13 +1,8 @@
 # Todo
 
-**SPRINT**
+* paused
 
-* [x] Move the branch to master
-* [ ] Tag a release and version (in the cli too)
-* [ ] Push to github
-
-
-## Follow On Steps
+## Next Steps (In no order yet)
 
 * [ ] Make the "home" view use the actual index.md/html
     * [ ] Make a fallback if it's not there
