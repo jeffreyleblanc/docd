@@ -16,6 +16,7 @@ UI
 Close Out and Deploy
 
 * [ ] Update the notes
+    * [ ] lunr as a python dep
     * [ ] docd.toml setup
     * [ ] cli usage
 * [x] Enable hosting sites to work with new output using caddy
