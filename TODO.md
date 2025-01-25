@@ -4,10 +4,11 @@
 
 Build System
 
-* [ ] Make the `push` command work again
-    * [ ] Test
+* [x] Make the `push` command work again
+    * [x] Test
     * [ ] Show the caddy fragment needed
-* Evaluate what else needs to be done...
+* [ ] Check on `max_depth` in `docd.toml`
+* [ ] Evaluate what else needs to be done...
     * probably cleaning up usage of DocdRunContext if haven't had to already
     * handle as installed vs not... or save for a next sprint
     * clean up devserver a little, or move some logic out of docd.py
@@ -15,6 +16,7 @@ Build System
 
 UI
 
+* [ ] Fix raw so it shows markdown links
 * [ ] Make the "home" view use the actual index.md/html
     * [ ] Make a fallback if it's not there
 
@@ -35,6 +37,9 @@ Close Out and Deploy
 
 ## Follow On Steps
 
+* [ ] lunr search update
+    * not getting common phrases like 'sway'?
+    * not adding things from title fields?
 * [ ] Version the search index
 * [ ] Enable the tornado in dev mode to request a page markdown rebuilt on the fly
     * [ ] basically, if I'm editing the source git file, if I just refresh, get the new one
