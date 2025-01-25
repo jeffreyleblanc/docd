@@ -83,7 +83,7 @@ def load_config(config_fpath):
 
 
 def run_cli(IN_DOCD_SOURCE_REPO):
-    __VERSION__ = "0.1.0"
+    __VERSION__ = "0.1.1"
 
     #-- Make the argparser -----------------------------------------------------------#
 
