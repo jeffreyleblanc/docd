@@ -5,7 +5,7 @@ from pathlib import Path
 
 # Load the spa page template
 HERE = Path(__file__).parent
-SPA_SRC_SPA_TEMPLATE_FILE = (HERE/"../spa-src/html-templates/spa.html").resolve()
+SPA_SRC_SPA_TEMPLATE_FILE = (HERE/"html-templates/spa.html").resolve()
 assert(SPA_SRC_SPA_TEMPLATE_FILE.is_file())
 SPA_TEMPLATE = SPA_SRC_SPA_TEMPLATE_FILE.read_text()
 

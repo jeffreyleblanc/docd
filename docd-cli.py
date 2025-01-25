@@ -150,7 +150,7 @@ def main():
     SPA_SRC_DIR = Path("spa-src").resolve()
     SPA_SRC_STATIC_DIST_STATIC_DIR = SPA_SRC_DIR/"dist/static"
     # spa-framework-dist/ paths
-    SPA_FRAMEWORK_DIST_DIR = Path("spa-framework-dist/dist").resolve()
+    SPA_FRAMEWORK_DIST_DIR = Path("docd/spa-framework-dist/dist").resolve()
     SPA_FRAMEWORK_DIST_STATIC_DIR = SPA_FRAMEWORK_DIST_DIR/"static"
     SPA_FRAMEWORK_DIST_RESOURCES_JSON_FILE = SPA_FRAMEWORK_DIST_DIR/"static-resources.json"
 

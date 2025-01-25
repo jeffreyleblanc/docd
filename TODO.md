@@ -2,17 +2,10 @@
 
 **SPRINT**
 
-Build System
+Installable
 
-* [x] Make the `push` command work again
-    * [x] Test
-    * [x] Show the caddy fragment needed
-* [x] Check on `max_depth` in `docd.toml`
-* [ ] Evaluate what else needs to be done...
-    * probably cleaning up usage of DocdRunContext if haven't had to already
-    * handle as installed vs not... or save for a next sprint
-    * clean up devserver a little, or move some logic out of docd.py
-    * etc...
+* [ ] Move spa-framework-dist into docd/
+* [ ] Make it work
 
 UI
 
@@ -52,3 +45,8 @@ Close Out and Deploy
 * add different lunrjs search syntax cheatsheet
 * enabled arrows/tab to navigate the search results
 * handle 404 in the spa vue-router for missing pages
+* [ ] Evaluate what else needs to be done...
+    * probably cleaning up usage of DocdRunContext if haven't had to already
+    * handle as installed vs not... or save for a next sprint
+    * clean up devserver a little, or move some logic out of docd.py
+    * etc...
