@@ -82,8 +82,8 @@ def load_config(config_fpath):
     return config
 
 
-def run_cli():
-    __VERSION__ = "0.0.4"
+def run_cli(IN_DOCD_SOURCE_REPO):
+    __VERSION__ = "0.1.0"
 
     #-- Make the argparser -----------------------------------------------------------#
 
@@ -131,16 +131,11 @@ def run_cli():
 
     #-- Generate Context -----------------------------------------------------------#
 
+    HERE = Path(__file__).parent
+
     # Make Context Object
     ctx = DocdRunContext()
-
-    # Determine if we are operating locally or from installed version,
-    # and then set support paths accordingly
-    HERE = Path(__file__).parent
-    if HERE == Path("/usr/local/bin"):
-        ctx.IN_DOCD_SOURCE_REPO = False
-    else:
-        ctx.IN_DOCD_SOURCE_REPO = True
+    ctx.IN_DOCD_SOURCE_REPO
 
     #-- Common Paths -------------------------------------------------------------------#
 
